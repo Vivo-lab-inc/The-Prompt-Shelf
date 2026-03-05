@@ -1,202 +1,103 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #06060b;
-  --color-surface: #0e0e16;
-  --color-surface-hover: #14141f;
-  --color-surface-alt: #0a0a12;
-  --color-border: #1e1e2e;
-  --color-border-hover: #2e2e42;
-  --color-text: #e8e8f0;
-  --color-text-muted: #6e6e88;
+  /* Core Monochrome Palette */
+  --color-bg: #0a0a0a;
+  --color-surface: #111111;
+  --color-surface-hover: #161616;
+
+  /* Extremely subtle borders */
+  --color-border-subtle: rgba(255, 255, 255, 0.05);
+  --color-border-strong: rgba(255, 255, 255, 0.12);
+
+  /* Spine colors */
+  --color-spine: #161616;
+  --color-spine-hover: #1c1c1c;
+
+  /* Typography */
+  --color-text-main: #ffffff;
+  --color-text-muted: #888888;
+  --color-text-faint: #4a4a4a;
+
+  /* Accent - used VERY sparingly */
   --color-accent: #7c5cfc;
-  --color-accent-hover: #9b7fff;
-  --color-accent-dim: rgba(124, 92, 252, 0.08);
-  --color-accent-glow: rgba(124, 92, 252, 0.25);
-  --color-green: #34d399;
-  --color-yellow: #fbbf24;
-  --color-pink: #f472b6;
-  --color-blue: #60a5fa;
-  --color-orange: #fb923c;
-  --color-cyan: #22d3ee;
 }
 
 body {
   background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--color-text-main);
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Rich code blocks */
-pre {
-  background: var(--color-surface) !important;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
-  padding: 1.25rem;
-  overflow-x: auto;
-  font-size: 0.85rem;
-  line-height: 1.7;
+/* Faint top ambient light */
+.top-ambient {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 1000px;
+  height: 500px;
+  background: radial-gradient(ellipse at top, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
 }
 
+/* Code blocks */
 code {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
 }
 
-::-webkit-scrollbar { width: 6px; height: 6px; }
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--color-bg); }
-::-webkit-scrollbar-thumb { background: var(--color-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb { background: var(--color-surface-hover); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--color-text-faint); }
 
-/* ---- Animated grid background ---- */
-.hero-grid {
-  background-image:
-    linear-gradient(rgba(124, 92, 252, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(124, 92, 252, 0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-  mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black, transparent);
-  -webkit-mask-image: radial-gradient(ellipse 70% 50% at 50% 0%, black, transparent);
-  animation: grid-drift 20s linear infinite;
-}
-
-@keyframes grid-drift {
-  0% { background-position: 0 0; }
-  100% { background-position: 60px 60px; }
-}
-
-/* ---- Glow card ---- */
-.glow-card {
-  position: relative;
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: 16px;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.glow-card::before {
-  content: '';
-  position: absolute;
-  inset: -1px;
-  border-radius: 17px;
-  padding: 1px;
-  background: linear-gradient(135deg, transparent 40%, var(--color-accent) 50%, var(--color-pink) 60%, transparent 70%);
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.glow-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 16px;
-  background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), var(--color-accent-dim), transparent 40%);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-
-.glow-card:hover {
-  border-color: transparent;
-  transform: translateY(-4px);
-  box-shadow:
-    0 8px 32px rgba(124, 92, 252, 0.08),
-    0 0 0 1px rgba(124, 92, 252, 0.1);
-}
-
-.glow-card:hover::before {
-  opacity: 1;
-}
-
-.glow-card:hover::after {
-  opacity: 1;
-}
-
-/* ---- Floating dots background ---- */
-.floating-dots {
-  background-image: radial-gradient(circle, rgba(124, 92, 252, 0.15) 1px, transparent 1px);
-  background-size: 24px 24px;
-}
-
-/* ---- Syntax highlight colors for code preview ---- */
-.code-preview .kw { color: #c792ea; }
-.code-preview .str { color: #c3e88d; }
-.code-preview .cm { color: #546e7a; }
-.code-preview .fn { color: #82aaff; }
-.code-preview .op { color: #89ddff; }
-.code-preview .var { color: #f07178; }
-.code-preview .num { color: #f78c6c; }
-.code-preview .type { color: #ffcb6b; }
-
-/* ---- Hero heading font ---- */
+/* Display font */
 .font-display {
   font-family: 'Space Grotesk', 'Inter', sans-serif;
   letter-spacing: -0.03em;
 }
 
-/* ---- Pulse ring ---- */
-@keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(52, 211, 153, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(52, 211, 153, 0); }
+/* Smooth page transitions */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.pulse-ring {
-  animation: pulse-ring 2s infinite;
+.animate-in {
+  animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* ---- Tool badge styles ---- */
-.badge-cursor {
-  background: rgba(96, 165, 250, 0.1);
-  color: var(--color-blue);
-  border-color: rgba(96, 165, 250, 0.2);
+.animate-in-delay-1 { animation-delay: 0.05s; opacity: 0; }
+.animate-in-delay-2 { animation-delay: 0.1s; opacity: 0; }
+.animate-in-delay-3 { animation-delay: 0.15s; opacity: 0; }
+
+/* Sidebar hover state */
+.sidebar-link {
+  transition: all 0.2s ease;
 }
-.badge-claude {
-  background: rgba(251, 146, 60, 0.1);
-  color: var(--color-orange);
-  border-color: rgba(251, 146, 60, 0.2);
-}
-.badge-agents {
-  background: rgba(52, 211, 153, 0.1);
-  color: var(--color-green);
-  border-color: rgba(52, 211, 153, 0.2);
+.sidebar-link:hover {
+  padding-left: 14px;
 }
 
-/* ---- Stat counter ---- */
-.stat-number {
-  font-variant-numeric: tabular-nums;
-  letter-spacing: -0.02em;
+/* Background grid pattern - wider spacing with intersection dots */
+.bg-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    radial-gradient(circle 1.5px at center, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 120px 120px, 120px 120px, 120px 120px;
+  mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, transparent 80%);
 }
 
-/* ---- Search glow ---- */
-.search-glow {
-  box-shadow:
-    0 0 0 1px var(--color-border),
-    0 2px 8px rgba(0, 0, 0, 0.3);
-  transition: all 0.3s ease;
-}
-
-.search-glow:focus-within {
-  box-shadow:
-    0 0 0 1px var(--color-accent),
-    0 0 20px rgba(124, 92, 252, 0.15),
-    0 4px 16px rgba(0, 0, 0, 0.4);
-}
-
-/* ---- Gradient border for sections ---- */
-.section-gradient {
-  position: relative;
-}
-
-.section-gradient::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 10%;
-  right: 10%;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--color-accent), var(--color-pink), transparent);
-  opacity: 0.3;
+/* Subtle noise texture */
+.bg-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.015'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
 }

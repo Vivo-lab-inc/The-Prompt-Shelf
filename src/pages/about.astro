@@ -2,41 +2,54 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="About - The Prompt Shelf" description="About The Prompt Shelf - a curated collection of AI coding rules and prompts.">
-  <div class="max-w-3xl mx-auto px-4 sm:px-6 py-16">
-    <h1 class="text-3xl font-bold mb-6">About The Prompt Shelf</h1>
+<Layout title="About - The-Prompt-Shelf" description="About The-Prompt-Shelf — a curated collection of AI coding rules and prompts.">
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="bg-grid absolute inset-0"></div>
+    <div class="bg-noise absolute inset-0"></div>
+  </div>
 
-    <div class="space-y-6 text-[--color-text-muted] leading-relaxed">
-      <p>
-        <strong class="text-[--color-text]">The Prompt Shelf</strong> is a curated gallery of AI coding rules and creative prompts.
-        We collect, organize, and showcase the best <code class="text-[--color-accent]">CLAUDE.md</code>,
-        <code class="text-[--color-accent]">.cursorrules</code>, <code class="text-[--color-accent]">AGENTS.md</code>,
-        and image generation prompts from the community.
+  <div class="max-w-3xl mx-auto px-6 py-16 relative z-10">
+    <h1 class="font-display text-3xl font-medium tracking-tight text-text-main mb-8"
+      data-en="About The-Prompt-Shelf"
+      data-ja="The-Prompt-Shelf について">The-Prompt-Shelf について</h1>
+
+    <div class="space-y-8 text-text-muted text-[15px] leading-relaxed">
+      <p data-en="The-Prompt-Shelf is a curated gallery of AI coding rules and prompts. We collect, organize, and showcase CLAUDE.md, .cursorrules, AGENTS.md, and image generation prompts from the open-source community."
+         data-ja="The-Prompt-Shelf は、AIコーディングルールとプロンプトのキュレーションギャラリーです。オープンソースコミュニティから CLAUDE.md、.cursorrules、AGENTS.md、画像生成プロンプトを収集・整理・紹介しています。">
+        The-Prompt-Shelf は、AIコーディングルールとプロンプトのキュレーションギャラリーです。オープンソースコミュニティから CLAUDE.md、.cursorrules、AGENTS.md、画像生成プロンプトを収集・整理・紹介しています。
       </p>
 
-      <p>
-        As AI coding tools become essential for developers, having well-crafted rules and prompts makes a huge difference
-        in code quality and productivity. But finding good examples is hard - they're scattered across GitHub repos,
-        blog posts, and Discord servers.
+      <p data-en="As AI coding assistants become essential tools for developers, well-crafted rules and prompts significantly improve code quality and productivity. But finding good examples is hard — they're scattered across GitHub repos, blog posts, and community forums."
+         data-ja="AIコーディングアシスタントが開発者にとって不可欠なツールとなる中、良質なルールとプロンプトはコード品質と生産性を大きく向上させます。しかし良い事例を見つけるのは難しく、GitHubリポジトリやブログ記事、コミュニティフォーラムに散在しています。">
+        AIコーディングアシスタントが開発者にとって不可欠なツールとなる中、良質なルールとプロンプトはコード品質と生産性を大きく向上させます。しかし良い事例を見つけるのは難しく、GitHubリポジトリやブログ記事、コミュニティフォーラムに散在しています。
       </p>
 
-      <p>
-        That's why we built The Prompt Shelf: a single, searchable destination where you can discover,
-        compare, and copy the perfect AI configuration for your project.
-      </p>
-
-      <h2 class="text-xl font-bold text-[--color-text] pt-4">What's included</h2>
-      <ul class="space-y-2 list-disc list-inside">
-        <li><strong class="text-[--color-text]">CLAUDE.md</strong> - Rules for Claude Code projects</li>
-        <li><strong class="text-[--color-text]">.cursorrules</strong> - Configuration for Cursor AI editor</li>
-        <li><strong class="text-[--color-text]">AGENTS.md</strong> - Multi-agent orchestration rules</li>
-        <li><strong class="text-[--color-text]">Image Prompts</strong> - Midjourney, DALL-E, Stable Diffusion prompts <span class="text-[--color-yellow]">(coming soon)</span></li>
+      <h2 class="text-xl font-medium text-text-main pt-4 tracking-tight"
+        data-en="What's included" data-ja="掲載コンテンツ">掲載コンテンツ</h2>
+      <ul class="space-y-2 text-text-muted list-disc list-inside">
+        <li><span class="text-text-main font-medium">.cursorrules</span> — Cursor AI エディタ用ルール設定</li>
+        <li><span class="text-text-main font-medium">CLAUDE.md</span> — Claude Code プロジェクト用ルール</li>
+        <li><span class="text-text-main font-medium">AGENTS.md</span> — マルチエージェント指示設定</li>
+        <li><span class="text-text-main font-medium">Image Prompts</span> — Midjourney, DALL-E, Stable Diffusion プロンプト <span class="text-text-faint">(coming soon)</span></li>
       </ul>
 
-      <h2 class="text-xl font-bold text-[--color-text] pt-4">Contact</h2>
+      <h2 class="text-xl font-medium text-text-main pt-4 tracking-tight"
+        data-en="Sources & Attribution" data-ja="引用元・出典について">引用元・出典について</h2>
+      <p data-en="All rules on The-Prompt-Shelf are sourced from publicly available open-source repositories and community contributions. Each rule page includes a link to its original source. We respect the licenses and rights of all original authors."
+         data-ja="The-Prompt-Shelf に掲載されているルールは、すべて公開されているオープンソースリポジトリやコミュニティの貢献から収集したものです。各ルールページには元の出典へのリンクを掲載しています。すべてのオリジナル作者のライセンスと権利を尊重しています。">
+        The-Prompt-Shelf に掲載されているルールは、すべて公開されているオープンソースリポジトリやコミュニティの貢献から収集したものです。各ルールページには元の出典へのリンクを掲載しています。すべてのオリジナル作者のライセンスと権利を尊重しています。
+      </p>
+      <p class="text-[13px] text-text-faint"
+        data-en="Major sources include: awesome-cursorrules by PatrickJS, cursor.directory, and various open-source GitHub repositories. If you are a content author and would like your rule removed or attributed differently, please contact us."
+        data-ja="主な出典: awesome-cursorrules (PatrickJS)、cursor.directory、その他オープンソースGitHubリポジトリ。コンテンツ作者の方で、掲載の削除や帰属表示の変更をご希望の場合はご連絡ください。">
+        主な出典: awesome-cursorrules (PatrickJS)、cursor.directory、その他オープンソースGitHubリポジトリ。コンテンツ作者の方で、掲載の削除や帰属表示の変更をご希望の場合はご連絡ください。
+      </p>
+
+      <h2 class="text-xl font-medium text-text-main pt-4 tracking-tight"
+        data-en="Contact" data-ja="お問い合わせ">お問い合わせ</h2>
       <p>
-        Built by <a href="https://x.com/yuto_lab_note" target="_blank" class="text-[--color-accent] hover:underline">@yuto_lab_note</a>.
-        Suggestions and contributions welcome!
+        <span data-en="Built by" data-ja="運営:">運営:</span>
+        <a href="https://x.com/yuto_lab_note" target="_blank" class="text-text-main hover:underline underline-offset-2">@yuto_lab_note</a>
       </p>
     </div>
   </div>

@@ -3,166 +3,119 @@ import Layout from '../layouts/Layout.astro';
 import RuleCard from '../components/RuleCard';
 import rules from '../data/rules.json';
 
-const featured = rules.sort((a, b) => b.stars - a.stars).slice(0, 6);
-const totalRules = rules.length;
-const toolCount = new Set(rules.map(r => r.tool)).size;
-const langCount = new Set(rules.map(r => r.language)).size;
+const featured = rules.sort((a, b) => b.stars - a.stars);
+const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
 ---
 
-<Layout title="The Prompt Shelf — Curated AI Rules & Prompts" description="The best CLAUDE.md, .cursorrules, AGENTS.md rules and image generation prompts. Curated, searchable, copy-ready.">
+<Layout title="The-Prompt-Shelf — Curated AI Rules & Prompts" description="A curated collection of system prompts, agent instructions, and context rules for modern AI coding assistants.">
 
-  <!-- Hero with animated grid -->
-  <section class="relative overflow-hidden border-b border-[--color-border]">
-    <!-- Animated grid -->
-    <div class="hero-grid absolute inset-0"></div>
-    <!-- Subtle ambient glow -->
-    <div class="absolute top-[-100px] left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[--color-accent]/[0.04] rounded-full blur-[150px]"></div>
+  <!-- Background layers -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="bg-grid absolute inset-0"></div>
+    <div class="bg-noise absolute inset-0"></div>
+    <div class="top-ambient"></div>
+  </div>
 
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-24 pb-20 relative">
-      <div class="text-center max-w-3xl mx-auto">
-        <!-- Status badge -->
-        <div class="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-[--color-surface] border border-[--color-border] text-[13px] text-[--color-text-muted] mb-8">
-          <span class="w-2 h-2 rounded-full bg-[--color-green] pulse-ring"></span>
-          <span>{totalRules} rules curated</span>
-          <span class="w-px h-3 bg-[--color-border]"></span>
-          <span>Updated daily</span>
-        </div>
+  <!-- Hero -->
+  <header class="pt-24 pb-16 px-6 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="flex flex-col items-center text-center space-y-6">
+      <h1 class="font-display text-4xl md:text-[44px] font-medium tracking-tight text-text-main animate-in">
+        The-Prompt-Shelf
+      </h1>
+      <p class="text-text-muted text-[15px] max-w-xl mx-auto leading-relaxed animate-in animate-in-delay-1" id="hero-desc"
+        data-en="A curated collection of system prompts, agent instructions, and context rules. Optimized for modern AI coding assistants."
+        data-ja="AIコーディングアシスタントのための、システムプロンプト・エージェント指示・コンテキストルールの厳選コレクション。"
+      >
+        AIコーディングアシスタントのための、システムプロンプト・エージェント指示・コンテキストルールの厳選コレクション。
+      </p>
 
-        <h1 class="font-display text-5xl sm:text-7xl font-bold leading-[1.05] mb-6 text-white">
-          The Prompt<br />Shelf
-        </h1>
-
-        <p class="text-lg sm:text-xl text-[--color-text-muted] mb-12 leading-relaxed max-w-2xl mx-auto">
-          Curated collection of AI coding rules and prompts.<br />
-          Find the perfect
-          <code class="text-[--color-orange] bg-[--color-orange]/[0.08] px-1.5 py-0.5 rounded text-[15px]">CLAUDE.md</code>,
-          <code class="text-[--color-blue] bg-[--color-blue]/[0.08] px-1.5 py-0.5 rounded text-[15px]">.cursorrules</code>, or
-          <code class="text-[--color-green] bg-[--color-green]/[0.08] px-1.5 py-0.5 rounded text-[15px]">AGENTS.md</code>
-          for your project.
-        </p>
-
-        <!-- Search bar - prominent -->
-        <div class="relative max-w-xl mx-auto mb-12">
-          <div class="search-glow rounded-2xl bg-[--color-surface]">
-            <div class="flex items-center">
-              <svg class="w-5 h-5 text-[--color-text-muted] ml-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-              </svg>
-              <input
-                type="text"
-                placeholder="Search rules... Next.js, FastAPI, Rust..."
-                class="w-full px-4 py-4 bg-transparent text-[--color-text] placeholder:text-[--color-text-muted]/40 outline-none text-[15px]"
-                id="hero-search"
-              />
-              <kbd class="hidden sm:inline-flex items-center px-2.5 py-1 mr-4 text-[11px] text-[--color-text-muted]/60 bg-[--color-bg] border border-[--color-border] rounded-md font-mono">
-                /
-              </kbd>
-            </div>
-          </div>
-        </div>
-
-        <!-- Shelf visual: book spines -->
-        <div class="flex justify-center gap-1 mb-6" id="shelf-spines">
-          <div class="w-8 h-20 rounded-sm bg-gradient-to-b from-[--color-blue]/40 to-[--color-blue]/10 border border-[--color-blue]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title=".cursorrules">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">.cursorrules</span>
-          </div>
-          <div class="w-10 h-24 rounded-sm bg-gradient-to-b from-[--color-orange]/40 to-[--color-orange]/10 border border-[--color-orange]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="CLAUDE.md">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">CLAUDE.md</span>
-          </div>
-          <div class="w-6 h-18 rounded-sm bg-gradient-to-b from-[--color-green]/40 to-[--color-green]/10 border border-[--color-green]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="AGENTS.md">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">AGENTS.md</span>
-          </div>
-          <div class="w-12 h-22 rounded-sm bg-gradient-to-b from-[--color-pink]/40 to-[--color-pink]/10 border border-[--color-pink]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="Image Prompts">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Prompts</span>
-          </div>
-          <div class="w-7 h-20 rounded-sm bg-gradient-to-b from-[--color-accent]/40 to-[--color-accent]/10 border border-[--color-accent]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="MCP">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">MCP</span>
-          </div>
-          <div class="w-9 h-22 rounded-sm bg-gradient-to-b from-[--color-cyan]/40 to-[--color-cyan]/10 border border-[--color-cyan]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="Security">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Security</span>
-          </div>
-          <div class="w-8 h-18 rounded-sm bg-gradient-to-b from-[--color-yellow]/40 to-[--color-yellow]/10 border border-[--color-yellow]/20 hover:scale-y-105 transition-transform cursor-pointer group relative" title="DevOps">
-            <span class="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] text-[--color-text-muted] opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">DevOps</span>
-          </div>
-        </div>
-        <!-- Shelf base -->
-        <div class="max-w-xs mx-auto h-[3px] bg-gradient-to-r from-transparent via-[--color-border] to-transparent rounded-full mt-8 mb-4"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Stats bar -->
-  <section class="border-b border-[--color-border] bg-[--color-surface-alt]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5">
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-6">
-        <div class="text-center">
-          <div class="text-2xl font-bold stat-number text-[--color-text]">{totalRules}</div>
-          <div class="text-xs text-[--color-text-muted] mt-0.5">Curated Rules</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold stat-number text-[--color-text]">{toolCount}</div>
-          <div class="text-xs text-[--color-text-muted] mt-0.5">AI Tools</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold stat-number text-[--color-text]">{langCount}</div>
-          <div class="text-xs text-[--color-text-muted] mt-0.5">Languages</div>
-        </div>
-        <div class="text-center">
-          <div class="text-2xl font-bold stat-number text-[--color-yellow]">Soon</div>
-          <div class="text-xs text-[--color-text-muted] mt-0.5">Image Prompts</div>
+      <!-- Search -->
+      <div class="w-full max-w-2xl pt-6 animate-in animate-in-delay-2">
+        <div class="relative">
+          <svg class="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <input
+            type="text"
+            id="hero-search"
+            placeholder="Search rules, frameworks, languages..."
+            class="w-full pl-14 pr-14 py-4 bg-gradient-to-r from-[#181818] to-[#141414] border border-border-subtle rounded-full text-text-main placeholder:text-[#555] outline-none focus:border-border-strong text-[15px] transition-colors"
+          />
+          <kbd class="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] text-text-faint/50 font-mono">/</kbd>
         </div>
       </div>
-    </div>
-  </section>
 
-  <!-- Featured Rules -->
-  <section class="section-gradient max-w-6xl mx-auto px-4 sm:px-6 py-16">
-    <div class="flex items-end justify-between mb-8">
+      <!-- Filters -->
+      <div class="flex flex-wrap items-center justify-center gap-2 pt-4 animate-in animate-in-delay-3">
+        {filters.map((filter, i) => (
+          <a
+            href={i === 0 ? '/rules' : `/rules?tool=${filter.toLowerCase().replace(' ', '-').replace('.', '')}`}
+            class:list={[
+              "px-4 py-1.5 rounded-full text-[13px] tracking-wide transition-all duration-200 border",
+              i === 0
+                ? "bg-white/[0.08] text-text-main border-white/10"
+                : "bg-transparent text-text-muted border-transparent hover:text-text-main hover:bg-white/[0.03]"
+            ]}
+          >
+            {filter}
+          </a>
+        ))}
+      </div>
+    </div>
+  </header>
+
+  <!-- Coding Rules Section -->
+  <section class="px-6 pb-24 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-2xl font-bold mb-1">Popular on the Shelf</h2>
-        <p class="text-sm text-[--color-text-muted]">Most starred rules from the community</p>
+        <h2 class="text-lg font-medium tracking-tight text-text-main">Coding Rules</h2>
+        <p class="text-[13px] text-text-faint mt-1 tracking-wide">CLAUDE.md, .cursorrules, AGENTS.md</p>
       </div>
-      <a href="/rules" class="text-sm text-[--color-accent] hover:text-[--color-accent-hover] transition-colors flex items-center gap-1.5 group">
-        Browse all
-        <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide">
+        View all
       </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-14">
       {featured.map(rule => (
         <RuleCard client:load rule={rule} />
       ))}
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="border-t border-[--color-border]">
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
-      <h2 class="text-3xl font-bold mb-4">Find Your Perfect Setup</h2>
-      <p class="text-[--color-text-muted] mb-8 max-w-lg mx-auto">
-        Browse our full collection of AI coding rules, filterable by tool, language, and category.
+  <!-- Image Prompts Section (Coming Soon) -->
+  <section class="px-6 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="border-t border-border-subtle pt-16">
+      <div class="flex items-center gap-3 mb-3">
+        <h2 class="text-lg font-medium tracking-tight text-text-main">Image Prompts</h2>
+        <span class="px-2 py-0.5 text-[10px] tracking-widest uppercase text-text-faint border border-border-subtle rounded-full">Soon</span>
+      </div>
+      <p class="text-[13px] text-text-faint tracking-wide mb-10">
+        Midjourney, DALL-E, Stable Diffusion, Flux — curated prompts with generated results.
       </p>
-      <a
-        href="/rules"
-        class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[--color-accent] hover:bg-[--color-accent-hover] text-white font-medium transition-colors"
-      >
-        Browse All Rules
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
-      </a>
+
+      <!-- Placeholder cards -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6">
+        {[1, 2, 3, 4].map(() => (
+          <div class="bg-surface border border-border-subtle rounded-[3px] overflow-hidden opacity-40">
+            <div class="aspect-[4/3] bg-gradient-to-br from-white/[0.02] to-transparent"></div>
+            <div class="p-5 space-y-3">
+              <div class="h-3 w-3/4 bg-white/[0.04] rounded-full"></div>
+              <div class="h-2 w-1/2 bg-white/[0.03] rounded-full"></div>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   </section>
 
-  <!-- Mouse tracking for glow cards -->
   <script>
-    // Hero search
     const searchInput = document.getElementById('hero-search');
     if (searchInput) {
       searchInput.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
           const query = (e.target as HTMLInputElement).value;
-          if (query.trim()) {
-            window.location.href = `/rules?q=${encodeURIComponent(query.trim())}`;
-          }
+          if (query.trim()) window.location.href = `/rules?q=${encodeURIComponent(query.trim())}`;
         }
       });
       document.addEventListener('keydown', (e) => {
@@ -172,17 +125,5 @@ const langCount = new Set(rules.map(r => r.language)).size;
         }
       });
     }
-
-    // Glow card mouse tracking
-    document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.glow-card');
-      cards.forEach((card) => {
-        const rect = (card as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
-        (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
-      });
-    });
   </script>
 </Layout>

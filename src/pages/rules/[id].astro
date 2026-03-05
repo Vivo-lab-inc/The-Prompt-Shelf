@@ -11,162 +11,211 @@ export function getStaticPaths() {
 }
 
 const { rule } = Astro.props;
-
-const toolConfig: Record<string, { label: string; class: string; gradient: string }> = {
-  'cursor': { label: '.cursorrules', class: 'badge-cursor', gradient: 'from-blue-500/30 to-blue-500/5' },
-  'claude-code': { label: 'CLAUDE.md', class: 'badge-claude', gradient: 'from-orange-500/30 to-orange-500/5' },
-  'agents-md': { label: 'AGENTS.md', class: 'badge-agents', gradient: 'from-green-500/30 to-green-500/5' },
-};
-
-const config = toolConfig[rule.tool] || toolConfig['agents-md'];
+const lineCount = rule.content.split('\n').length;
+const shareText = `${rule.title} - AI coding rules for ${rule.language}${rule.framework !== 'Any' ? ` + ${rule.framework}` : ''}`;
+const shareUrl = `https://thepromptshelf.dev/rules/${rule.id}`;
 
 const related = rules
   .filter(r => r.id !== rule.id && (r.category === rule.category || r.language === rule.language))
   .sort((a, b) => b.stars - a.stars)
-  .slice(0, 3);
+  .slice(0, 4);
 
-const lineCount = rule.content.split('\n').length;
+const toolCounts = {
+  'claude-code': rules.filter(r => r.tool === 'claude-code').length,
+  'cursor': rules.filter(r => r.tool === 'cursor').length,
+  'agents-md': rules.filter(r => r.tool === 'agents-md').length,
+};
+const categoryCounts: Record<string, number> = {};
+rules.forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
+
+const categoryLabels: Record<string, string> = {
+  'web-frontend': 'Frontend',
+  'backend': 'Backend',
+  'cli': 'CLI',
+  'devops': 'DevOps',
+  'security': 'Security',
+};
 ---
 
-<Layout title={`${rule.title} - The Prompt Shelf`} description={rule.description}>
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 py-10">
-    <!-- Breadcrumb -->
-    <nav class="flex items-center gap-2 text-[13px] text-[--color-text-muted] mb-10">
-      <a href="/" class="hover:text-[--color-text] transition-colors">Home</a>
-      <span class="text-[--color-border]">/</span>
-      <a href="/rules" class="hover:text-[--color-text] transition-colors">Rules</a>
-      <span class="text-[--color-border]">/</span>
-      <span class="text-[--color-text]">{rule.title}</span>
-    </nav>
+<Layout title={`${rule.title} - The-Prompt-Shelf`} description={rule.description}>
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="bg-grid absolute inset-0"></div>
+    <div class="bg-noise absolute inset-0"></div>
+  </div>
 
-    <div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-10">
+  <div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
+
+      <!-- Sidebar -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-8">
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">Browse</h3>
+            <nav class="space-y-1">
+              <a href="/rules" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-all">
+                <span>All Rules</span>
+                <span class="text-text-faint text-[11px]">{rules.length}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Tool</h3>
+            <nav class="space-y-1">
+              <a href="/rules?tool=claude-code" class:list={["sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] transition-all", rule.tool === 'claude-code' ? 'text-text-main bg-white/[0.04] border border-border-subtle' : 'text-text-muted hover:text-text-main hover:bg-white/[0.03]']}>
+                <span>CLAUDE.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['claude-code']}</span>
+              </a>
+              <a href="/rules?tool=cursor" class:list={["sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] transition-all", rule.tool === 'cursor' ? 'text-text-main bg-white/[0.04] border border-border-subtle' : 'text-text-muted hover:text-text-main hover:bg-white/[0.03]']}>
+                <span>.cursorrules</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['cursor']}</span>
+              </a>
+              <a href="/rules?tool=agents-md" class:list={["sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] transition-all", rule.tool === 'agents-md' ? 'text-text-main bg-white/[0.04] border border-border-subtle' : 'text-text-muted hover:text-text-main hover:bg-white/[0.03]']}>
+                <span>AGENTS.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['agents-md']}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Category</h3>
+            <nav class="space-y-1">
+              {Object.entries(categoryCounts).map(([cat, count]) => (
+                <a href={`/rules?category=${cat}`} class:list={["sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] transition-all", rule.category === cat ? 'text-text-main bg-white/[0.04] border border-border-subtle' : 'text-text-muted hover:text-text-main hover:bg-white/[0.03]']}>
+                  <span>{categoryLabels[cat] || cat}</span>
+                  <span class="text-text-faint text-[11px]">{count}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+
+          <!-- Current rule info -->
+          <div class="border-t border-border-subtle pt-6">
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-3">Details</h3>
+            <dl class="space-y-2 text-[12px]">
+              <div class="flex justify-between">
+                <dt class="text-text-faint">Language</dt>
+                <dd class="text-text-muted">{rule.language}</dd>
+              </div>
+              {rule.framework !== 'Any' && (
+                <div class="flex justify-between">
+                  <dt class="text-text-faint">Framework</dt>
+                  <dd class="text-text-muted">{rule.framework}</dd>
+                </div>
+              )}
+              <div class="flex justify-between">
+                <dt class="text-text-faint">Author</dt>
+                <dd class="text-text-muted">{rule.author}</dd>
+              </div>
+            </dl>
+
+            <div class="flex flex-wrap gap-1.5 mt-4">
+              {rule.tags.map((tag: string) => (
+                <a href={`/rules?q=${tag}`} class="text-[10px] px-2 py-[2px] rounded-full border border-border-subtle text-text-faint hover:text-text-muted transition-all">
+                  {tag}
+                </a>
+              ))}
+            </div>
+
+            {rule.sourceUrl && (
+              <div class="mt-4">
+                <a href={rule.sourceUrl} target="_blank" rel="noopener" class="text-[11px] text-text-faint hover:text-text-muted transition-colors flex items-center gap-1.5">
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  Source
+                </a>
+              </div>
+            )}
+
+            <button
+              id="copy-btn-sidebar"
+              class="w-full mt-5 py-2.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-[3px] text-[12px] text-text-main font-medium transition-colors tracking-wide"
+            >
+              Copy to Clipboard
+            </button>
+
+            <a
+              href={`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+              target="_blank"
+              rel="noopener"
+              class="w-full mt-2 py-2.5 bg-transparent hover:bg-white/[0.04] border border-border-subtle rounded-[3px] text-[12px] text-text-faint hover:text-text-muted font-medium transition-colors tracking-wide flex items-center justify-center gap-2"
+            >
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              Share on X
+            </a>
+          </div>
+        </div>
+      </aside>
+
       <!-- Main content -->
       <div>
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-[13px] text-text-faint mb-10 tracking-wide">
+          <a href="/" class="hover:text-text-muted transition-colors">Home</a>
+          <span>/</span>
+          <a href="/rules" class="hover:text-text-muted transition-colors">Rules</a>
+          <span>/</span>
+          <span class="text-text-muted" data-en={rule.title} data-ja={rule.title_ja || rule.title}>{rule.title_ja || rule.title}</span>
+        </nav>
+
         <!-- Header -->
         <div class="mb-8">
-          <div class="flex items-center gap-3 mb-5">
-            <span class={"px-3 py-1.5 text-[12px] font-semibold rounded-lg border uppercase tracking-wider " + config.class}>
-              {config.label}
+          <div class="flex items-center gap-3 mb-4">
+            <span class="px-2.5 py-1 text-[10px] font-medium tracking-wider uppercase bg-white/[0.06] border border-white/[0.08] rounded-full text-text-main">
+              {rule.format}
             </span>
-            <span class="flex items-center gap-1.5 text-sm text-[--color-text-muted]">
-              <svg class="w-4 h-4 fill-[--color-yellow]/40 text-[--color-yellow]" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              {rule.stars.toLocaleString()}
+            <span class="text-[12px] text-text-faint flex items-center gap-1">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="opacity-50"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              {rule.stars}
             </span>
           </div>
 
-          <h1 class="text-3xl sm:text-4xl font-bold mb-3 leading-tight">{rule.title}</h1>
-          <p class="text-lg text-[--color-text-muted] leading-relaxed">{rule.description}</p>
+          <h1 id="rule-title" class="font-display text-3xl font-medium tracking-tight text-text-main mb-3"
+            data-en={rule.title} data-ja={rule.title_ja || rule.title}>{rule.title_ja || rule.title}</h1>
+          <p id="rule-desc" class="text-text-muted text-[15px] leading-relaxed"
+            data-en={rule.description} data-ja={rule.description_ja || rule.description}>{rule.description_ja || rule.description}</p>
         </div>
 
         <!-- Code block -->
-        <div class="relative group">
-          <!-- Shelf spine accent on the left -->
-          <div class={"absolute left-0 top-0 bottom-0 w-1 rounded-l-xl bg-gradient-to-b " + config.gradient}></div>
+        <div class="relative">
+          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-spine rounded-l-sm"></div>
 
-          <div class="bg-[--color-surface] border border-[--color-border] rounded-xl overflow-hidden">
-            <!-- File header -->
-            <div class="flex items-center justify-between px-5 py-3 border-b border-[--color-border] bg-[--color-surface-alt]">
-              <div class="flex items-center gap-2">
-                <div class="flex gap-1.5">
-                  <div class="w-3 h-3 rounded-full bg-[#ff5f57]/70"></div>
-                  <div class="w-3 h-3 rounded-full bg-[#febc2e]/70"></div>
-                  <div class="w-3 h-3 rounded-full bg-[#28c840]/70"></div>
-                </div>
-                <span class="ml-3 text-[12px] text-[--color-text-muted] font-mono">{rule.format}</span>
-                <span class="text-[11px] text-[--color-text-muted]/40 font-mono">{lineCount} lines</span>
+          <div class="bg-surface border border-border-subtle rounded-[3px] overflow-hidden">
+            <div class="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
+              <div class="flex items-center gap-3">
+                <span class="text-[12px] text-text-faint font-mono">{rule.format}</span>
+                <span class="text-[11px] text-text-faint/50">{lineCount} lines</span>
               </div>
-              <button
-                id="copy-btn"
-                class="flex items-center gap-2 px-3 py-1.5 text-[12px] rounded-lg bg-[--color-bg] border border-[--color-border] text-[--color-text-muted] hover:text-[--color-text] hover:border-[--color-accent]/30 transition-all"
-              >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
-                </svg>
+              <button id="copy-btn" class="text-[12px] text-text-faint hover:text-text-muted transition-colors tracking-wide">
                 <span id="copy-text">Copy</span>
               </button>
             </div>
 
-            <!-- Code content -->
-            <div class="p-5 overflow-x-auto">
-              <pre class="!bg-transparent !border-0 !p-0 !m-0 !rounded-none"><code id="rule-content" class="text-[13px] leading-[1.75] !font-mono text-[--color-text]/85 whitespace-pre-wrap break-words">{rule.content}</code></pre>
+            <div class="p-6 overflow-x-auto">
+              <pre class="!bg-transparent !border-0 !p-0 !m-0 !rounded-none"><code class="text-[13px] leading-[1.8] font-mono text-text-muted whitespace-pre-wrap break-words">{rule.content}</code></pre>
             </div>
           </div>
         </div>
+
+        <!-- Source attribution -->
+        {rule.sourceUrl && (
+          <div class="mt-4 text-[12px] text-text-faint">
+            Source: <a href={rule.sourceUrl} target="_blank" rel="noopener" class="hover:text-text-muted transition-colors underline underline-offset-2">{rule.source}</a>
+          </div>
+        )}
+
+        <!-- Related -->
+        {related.length > 0 && (
+          <section class="mt-20 pt-12 border-t border-border-subtle">
+            <h2 class="text-lg font-medium mb-8 tracking-tight">Related Rules</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-14">
+              {related.slice(0, 3).map(r => (
+                <RuleCard client:visible rule={r} />
+              ))}
+            </div>
+          </section>
+        )}
       </div>
-
-      <!-- Sidebar -->
-      <aside class="space-y-6">
-        <!-- Meta card -->
-        <div class="rounded-xl bg-[--color-surface] border border-[--color-border] p-5">
-          <h3 class="text-sm font-semibold mb-4 text-[--color-text-muted] uppercase tracking-wider">Details</h3>
-          <dl class="space-y-3.5">
-            <div class="flex justify-between">
-              <dt class="text-[13px] text-[--color-text-muted]">Language</dt>
-              <dd class="text-[13px] font-medium">{rule.language}</dd>
-            </div>
-            {rule.framework !== 'Any' && (
-              <div class="flex justify-between">
-                <dt class="text-[13px] text-[--color-text-muted]">Framework</dt>
-                <dd class="text-[13px] font-medium">{rule.framework}</dd>
-              </div>
-            )}
-            <div class="flex justify-between">
-              <dt class="text-[13px] text-[--color-text-muted]">Category</dt>
-              <dd class="text-[13px] font-medium capitalize">{rule.category.replace('-', ' ')}</dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-[13px] text-[--color-text-muted]">Author</dt>
-              <dd class="text-[13px] font-medium">{rule.author}</dd>
-            </div>
-            <div class="flex justify-between">
-              <dt class="text-[13px] text-[--color-text-muted]">Source</dt>
-              <dd class="text-[13px] font-medium">{rule.source}</dd>
-            </div>
-          </dl>
-        </div>
-
-        <!-- Tags -->
-        <div class="rounded-xl bg-[--color-surface] border border-[--color-border] p-5">
-          <h3 class="text-sm font-semibold mb-3 text-[--color-text-muted] uppercase tracking-wider">Tags</h3>
-          <div class="flex flex-wrap gap-2">
-            {rule.tags.map((tag: string) => (
-              <a
-                href={`/rules?q=${tag}`}
-                class="px-2.5 py-1 text-[11px] rounded-full bg-[--color-bg] border border-[--color-border] text-[--color-text-muted] hover:text-[--color-accent] hover:border-[--color-accent]/30 transition-all"
-              >
-                {tag}
-              </a>
-            ))}
-          </div>
-        </div>
-
-        <!-- Quick copy card -->
-        <div class="rounded-xl bg-gradient-to-br from-[--color-accent]/[0.08] to-transparent border border-[--color-accent]/20 p-5">
-          <h3 class="text-sm font-semibold mb-2">Use this rule</h3>
-          <p class="text-[12px] text-[--color-text-muted] mb-3">
-            Copy and paste into your project's <code class="text-[--color-accent]">{rule.format}</code> file.
-          </p>
-          <button
-            id="copy-btn-sidebar"
-            class="w-full py-2.5 rounded-lg bg-[--color-accent] hover:bg-[--color-accent-hover] text-white text-sm font-medium transition-colors"
-          >
-            Copy to Clipboard
-          </button>
-        </div>
-      </aside>
     </div>
-
-    <!-- Related Rules -->
-    {related.length > 0 && (
-      <section class="section-gradient mt-20 pt-12">
-        <h2 class="text-xl font-bold mb-6">Related Rules</h2>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {related.map(r => (
-            <RuleCard client:visible rule={r} />
-          ))}
-        </div>
-      </section>
-    )}
   </div>
 
   <script define:vars={{ content: rule.content }}>
@@ -176,11 +225,10 @@ const lineCount = rule.content.split('\n').length;
         try {
           await navigator.clipboard.writeText(content);
           if (btnId === 'copy-btn') {
-            const text = document.getElementById('copy-text');
-            text.textContent = 'Copied!';
-            setTimeout(() => { text.textContent = 'Copy'; }, 2000);
+            document.getElementById('copy-text').textContent = 'Copied';
+            setTimeout(() => { document.getElementById('copy-text').textContent = 'Copy'; }, 2000);
           } else {
-            btn.textContent = 'Copied!';
+            btn.textContent = 'Copied';
             setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
           }
         } catch {}
@@ -188,15 +236,5 @@ const lineCount = rule.content.split('\n').length;
     }
     setupCopy('copy-btn');
     setupCopy('copy-btn-sidebar');
-
-    // Glow card mouse tracking
-    document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.glow-card');
-      cards.forEach((card) => {
-        const rect = card.getBoundingClientRect();
-        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-      });
-    });
   </script>
 </Layout>

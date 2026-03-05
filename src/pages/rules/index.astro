@@ -2,29 +2,125 @@
 import Layout from '../../layouts/Layout.astro';
 import SearchAndFilter from '../../components/SearchAndFilter';
 import rules from '../../data/rules.json';
+
+const toolCounts = {
+  'claude-code': rules.filter(r => r.tool === 'claude-code').length,
+  'cursor': rules.filter(r => r.tool === 'cursor').length,
+  'agents-md': rules.filter(r => r.tool === 'agents-md').length,
+};
+const categoryCounts: Record<string, number> = {};
+rules.forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
+const languageCounts: Record<string, number> = {};
+rules.forEach(r => { languageCounts[r.language] = (languageCounts[r.language] || 0) + 1; });
+
+const tagCounts: Record<string, number> = {};
+rules.forEach(r => r.tags.forEach(tag => { tagCounts[tag] = (tagCounts[tag] || 0) + 1; }));
+const topTags = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]).slice(0, 15);
+
+const categoryLabels: Record<string, string> = {
+  'web-frontend': 'Frontend',
+  'backend': 'Backend',
+  'cli': 'CLI',
+  'devops': 'DevOps',
+  'security': 'Security',
+};
 ---
 
-<Layout title="Browse Rules - The Prompt Shelf" description="Browse all AI coding rules. Filter by tool, language, and category.">
-  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
-    <div class="mb-8">
-      <h1 class="text-3xl font-bold mb-1">Browse the Shelf</h1>
-      <p class="text-[--color-text-muted] text-sm">Discover AI coding rules for every tool and stack</p>
+<Layout title="Browse the Shelf - The-Prompt-Shelf" description="Browse all AI coding rules. Filter by tool, language, and category.">
+  <!-- Background -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="bg-grid absolute inset-0"></div>
+    <div class="bg-noise absolute inset-0"></div>
+  </div>
+
+  <div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
+
+      <!-- Sidebar (the shelf index) -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-8">
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">Browse</h3>
+            <nav class="space-y-1">
+              <a href="/rules" class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-main bg-white/[0.04] border border-border-subtle">
+                <span>All Rules</span>
+                <span class="text-text-faint text-[11px]">{rules.length}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Tool</h3>
+            <nav class="space-y-1">
+              <a href="/rules?tool=claude-code" class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted sidebar-link hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                <span>CLAUDE.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['claude-code']}</span>
+              </a>
+              <a href="/rules?tool=cursor" class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                <span>.cursorrules</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['cursor']}</span>
+              </a>
+              <a href="/rules?tool=agents-md" class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                <span>AGENTS.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['agents-md']}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Category</h3>
+            <nav class="space-y-1">
+              {Object.entries(categoryCounts).map(([cat, count]) => (
+                <a href={`/rules?category=${cat}`} class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                  <span>{categoryLabels[cat] || cat}</span>
+                  <span class="text-text-faint text-[11px]">{count}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Language</h3>
+            <nav class="space-y-1">
+              {Object.entries(languageCounts).map(([lang, count]) => (
+                <a href={`/rules?language=${lang}`} class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                  <span>{lang}</span>
+                  <span class="text-text-faint text-[11px]">{count}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">Tags</h3>
+            <div class="flex flex-wrap gap-1.5">
+              {topTags.map(([tag, count]) => (
+                <a href={`/rules?q=${tag}`} class="text-[10px] px-2 py-[3px] rounded-full border border-border-subtle text-text-faint hover:text-text-muted hover:border-border-strong transition-all">
+                  {tag}
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <!-- Shelf divider -->
+          <div class="border-t border-border-subtle pt-6">
+            <div class="px-3 py-2 rounded-[3px] text-[13px] text-text-faint flex items-center justify-between">
+              <span>Image Prompts</span>
+              <span class="text-[10px] tracking-widest uppercase">Soon</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div>
+        <div class="mb-8">
+          <h1 class="text-2xl font-medium tracking-tight text-text-main mb-1">Browse the Shelf</h1>
+          <p class="text-[13px] text-text-faint tracking-wide">Discover AI coding rules for every tool and stack</p>
+        </div>
+
+        <SearchAndFilter client:load rules={rules} />
+      </div>
     </div>
-
-    <SearchAndFilter client:load rules={rules} />
-  </section>
-
-  <!-- Mouse tracking for glow cards -->
-  <script>
-    document.addEventListener('mousemove', (e) => {
-      const cards = document.querySelectorAll('.glow-card');
-      cards.forEach((card) => {
-        const rect = (card as HTMLElement).getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
-        (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
-      });
-    });
-  </script>
+  </div>
 </Layout>

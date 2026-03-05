@@ -1,28 +1,12 @@
-import { useState, useMemo } from 'react';
-import { Search, X } from 'lucide-react';
+import { useState, useMemo, useEffect } from 'react';
 import RuleCard from './RuleCard';
-import { cn } from '../lib/utils';
-
-interface Rule {
-  id: string;
-  title: string;
-  description: string;
-  tool: string;
-  format: string;
-  language: string;
-  framework: string;
-  category: string;
-  tags: string[];
-  author: string;
-  source: string;
-  stars: number;
-  content: string;
-}
+import type { Rule } from './RuleCard';
 
 const toolFilters = [
-  { value: 'claude-code', label: 'CLAUDE.md', class: 'badge-claude' },
-  { value: 'cursor', label: '.cursorrules', class: 'badge-cursor' },
-  { value: 'agents-md', label: 'AGENTS.md', class: 'badge-agents' },
+  { value: '', label: 'All' },
+  { value: 'claude-code', label: 'Claude Code' },
+  { value: 'cursor', label: 'Cursor' },
+  { value: 'agents-md', label: 'Agents.md' },
 ];
 
 const categoryFilters = [
@@ -33,160 +17,132 @@ const categoryFilters = [
   { value: 'security', label: 'Security' },
 ];
 
-type SortOption = 'stars' | 'newest' | 'title';
+function getParams() {
+  if (typeof window === 'undefined') return { q: '', tool: '', category: '' };
+  const p = new URLSearchParams(window.location.search);
+  return {
+    q: p.get('q') || '',
+    tool: p.get('tool') || '',
+    category: p.get('category') || '',
+  };
+}
 
-export default function SearchAndFilter({ rules, initialQuery = '', initialTool = '', initialLanguage = '' }: { rules: Rule[], initialQuery?: string, initialTool?: string, initialLanguage?: string }) {
-  const [query, setQuery] = useState(initialQuery);
-  const [activeTool, setActiveTool] = useState(initialTool);
+export default function SearchAndFilter({ rules }: { rules: Rule[] }) {
+  const [query, setQuery] = useState('');
+  const [activeTool, setActiveTool] = useState('');
   const [activeCategory, setActiveCategory] = useState('');
-  const [activeLanguage, setActiveLanguage] = useState(initialLanguage);
-  const [sort, setSort] = useState<SortOption>('stars');
 
-  const languages = useMemo(() => [...new Set(rules.map(r => r.language))], [rules]);
+  // Read URL params on mount
+  useEffect(() => {
+    const { q, tool, category } = getParams();
+    if (q) setQuery(q);
+    if (tool) setActiveTool(tool);
+    if (category) setActiveCategory(category);
+  }, []);
 
   const filtered = useMemo(() => {
     let result = [...rules];
-
     if (query) {
       const q = query.toLowerCase();
       result = result.filter(r =>
         r.title.toLowerCase().includes(q) ||
+        (r.title_ja || '').toLowerCase().includes(q) ||
         r.description.toLowerCase().includes(q) ||
+        (r.description_ja || '').toLowerCase().includes(q) ||
+        r.tool.toLowerCase().includes(q) ||
+        r.format.toLowerCase().includes(q) ||
         r.tags.some(t => t.includes(q)) ||
+        r.language.toLowerCase().includes(q) ||
+        r.framework.toLowerCase().includes(q) ||
         r.content.toLowerCase().includes(q)
       );
     }
-
     if (activeTool) result = result.filter(r => r.tool === activeTool);
     if (activeCategory) result = result.filter(r => r.category === activeCategory);
-    if (activeLanguage) result = result.filter(r => r.language === activeLanguage);
+    return result.sort((a, b) => b.stars - a.stars);
+  }, [rules, query, activeTool, activeCategory]);
 
-    result.sort((a, b) => {
-      if (sort === 'stars') return b.stars - a.stars;
-      if (sort === 'title') return a.title.localeCompare(b.title);
-      return 0;
-    });
-
-    return result;
-  }, [rules, query, activeTool, activeCategory, activeLanguage, sort]);
-
-  const hasFilters = query || activeTool || activeCategory || activeLanguage;
-
-  function clearAll() {
-    setQuery('');
-    setActiveTool('');
-    setActiveCategory('');
-    setActiveLanguage('');
-  }
+  const hasFilters = query || activeTool || activeCategory;
 
   return (
     <div>
       {/* Search */}
-      <div className="search-glow relative rounded-xl bg-[--color-surface] mb-6">
-        <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-[--color-text-muted]" />
+      <div className="relative mb-8">
+        <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-faint" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
         <input
           type="text"
           value={query}
           onChange={e => setQuery(e.target.value)}
-          placeholder="Search rules, frameworks, languages..."
-          className="w-full pl-12 pr-12 py-3.5 bg-transparent text-[--color-text] placeholder:text-[--color-text-muted]/50 outline-none text-sm"
+          placeholder="Search rules..."
+          className="w-full pl-11 pr-4 py-3 bg-surface border border-border-subtle rounded-[3px] text-text-main placeholder:text-text-faint outline-none focus:border-border-strong text-[14px] transition-colors"
         />
-        {query && (
-          <button onClick={() => setQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2 text-[--color-text-muted] hover:text-[--color-text]">
-            <X size={16} />
-          </button>
-        )}
       </div>
 
-      {/* Filter bar */}
-      <div className="flex flex-wrap items-center gap-2 mb-8">
-        {/* Tool filters */}
+      {/* Filters */}
+      <div className="flex flex-wrap items-center gap-2 mb-10">
         {toolFilters.map(f => (
           <button
             key={f.value}
             onClick={() => setActiveTool(activeTool === f.value ? '' : f.value)}
-            className={cn(
-              "px-3 py-1.5 text-[12px] font-medium rounded-lg border transition-all",
+            className={`px-4 py-1.5 rounded-full text-[13px] tracking-wide transition-all duration-200 border ${
               activeTool === f.value
-                ? f.class + " ring-1 ring-current/20"
-                : "bg-[--color-surface] border-[--color-border] text-[--color-text-muted] hover:text-[--color-text] hover:border-[--color-border-hover]"
-            )}
+                ? 'bg-white/[0.08] text-text-main border-white/10'
+                : 'bg-transparent text-text-muted border-transparent hover:text-text-main hover:bg-white/[0.03]'
+            }`}
           >
             {f.label}
           </button>
         ))}
 
-        <span className="w-px h-5 bg-[--color-border] mx-1" />
+        <span className="w-px h-4 bg-border-subtle mx-2" />
 
-        {/* Category filters */}
         {categoryFilters.map(f => (
           <button
             key={f.value}
             onClick={() => setActiveCategory(activeCategory === f.value ? '' : f.value)}
-            className={cn(
-              "px-3 py-1.5 text-[12px] rounded-lg border transition-all",
+            className={`px-4 py-1.5 rounded-full text-[13px] tracking-wide transition-all duration-200 border ${
               activeCategory === f.value
-                ? "bg-[--color-accent-dim] border-[--color-accent]/30 text-[--color-accent]"
-                : "bg-[--color-surface] border-[--color-border] text-[--color-text-muted] hover:text-[--color-text] hover:border-[--color-border-hover]"
-            )}
+                ? 'bg-white/[0.08] text-text-main border-white/10'
+                : 'bg-transparent text-text-muted border-transparent hover:text-text-main hover:bg-white/[0.03]'
+            }`}
           >
             {f.label}
           </button>
         ))}
 
-        <span className="w-px h-5 bg-[--color-border] mx-1" />
-
-        {/* Language dropdown */}
-        <select
-          value={activeLanguage}
-          onChange={e => setActiveLanguage(e.target.value)}
-          className="px-3 py-1.5 text-[12px] rounded-lg bg-[--color-surface] border border-[--color-border] text-[--color-text-muted] outline-none cursor-pointer hover:border-[--color-border-hover]"
-        >
-          <option value="">All Languages</option>
-          {languages.map(l => <option key={l} value={l}>{l}</option>)}
-        </select>
-
-        {/* Sort */}
-        <div className="ml-auto flex items-center gap-2">
-          {hasFilters && (
-            <button onClick={clearAll} className="text-[12px] text-[--color-accent] hover:underline">
-              Clear filters
-            </button>
-          )}
-          <select
-            value={sort}
-            onChange={e => setSort(e.target.value as SortOption)}
-            className="px-3 py-1.5 text-[12px] rounded-lg bg-[--color-surface] border border-[--color-border] text-[--color-text-muted] outline-none cursor-pointer"
+        {hasFilters && (
+          <button
+            onClick={() => { setQuery(''); setActiveTool(''); setActiveCategory(''); }}
+            className="ml-auto text-[12px] text-text-faint hover:text-text-muted transition-colors"
           >
-            <option value="stars">Most Popular</option>
-            <option value="title">Alphabetical</option>
-          </select>
-        </div>
+            Clear
+          </button>
+        )}
       </div>
 
-      {/* Results count */}
-      <div className="flex items-center justify-between mb-5">
-        <p className="text-sm text-[--color-text-muted]">
-          <span className="text-[--color-text] font-medium stat-number">{filtered.length}</span> rules
-          {hasFilters && <span> matching</span>}
-        </p>
-      </div>
+      {/* Count */}
+      <p className="text-[13px] text-text-faint mb-8 tracking-wide">
+        {filtered.length} rules
+      </p>
 
       {/* Grid */}
       {filtered.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-14">
           {filtered.map(rule => (
             <RuleCard key={rule.id} rule={rule} />
           ))}
         </div>
       ) : (
-        <div className="text-center py-24">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[--color-surface] border border-[--color-border] mb-4">
-            <Search size={24} className="text-[--color-text-muted]" />
-          </div>
-          <h3 className="text-lg font-medium mb-2">No rules found</h3>
-          <p className="text-[--color-text-muted] text-sm mb-4">Try adjusting your search or filters</p>
-          <button onClick={clearAll} className="text-sm text-[--color-accent] hover:underline">Clear all filters</button>
+        <div className="text-center py-32">
+          <p className="text-text-muted mb-2">No rules found</p>
+          <button
+            onClick={() => { setQuery(''); setActiveTool(''); setActiveCategory(''); }}
+            className="text-[13px] text-text-faint hover:text-text-muted transition-colors"
+          >
+            Clear filters
+          </button>
         </div>
       )}
     </div>
