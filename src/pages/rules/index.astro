@@ -1,0 +1,30 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import SearchAndFilter from '../../components/SearchAndFilter';
+import rules from '../../data/rules.json';
+---
+
+<Layout title="Browse Rules - The Prompt Shelf" description="Browse all AI coding rules. Filter by tool, language, and category.">
+  <section class="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-1">Browse the Shelf</h1>
+      <p class="text-[--color-text-muted] text-sm">Discover AI coding rules for every tool and stack</p>
+    </div>
+
+    <SearchAndFilter client:load rules={rules} />
+  </section>
+
+  <!-- Mouse tracking for glow cards -->
+  <script>
+    document.addEventListener('mousemove', (e) => {
+      const cards = document.querySelectorAll('.glow-card');
+      cards.forEach((card) => {
+        const rect = (card as HTMLElement).getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        (card as HTMLElement).style.setProperty('--mouse-x', `${x}px`);
+        (card as HTMLElement).style.setProperty('--mouse-y', `${y}px`);
+      });
+    });
+  </script>
+</Layout>
