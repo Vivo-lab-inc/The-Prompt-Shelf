@@ -17,6 +17,13 @@ pnpm-debug.log*
 .env
 .env.production
 
+# internal scripts (local only)
+scripts/daily_collector.py
+scripts/generate_preview.py
+scripts/fetch_and_update_content.py
+scripts/add_rules_batch.py
+logs/
+
 # macOS-specific files
 .DS_Store
 
