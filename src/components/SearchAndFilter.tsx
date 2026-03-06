@@ -7,6 +7,7 @@ const toolFilters = [
   { value: 'claude-code', label: 'Claude Code' },
   { value: 'cursor', label: 'Cursor' },
   { value: 'agents-md', label: 'Agents.md' },
+  { value: 'image-prompt', label: 'Image Prompts' },
 ];
 
 const categoryFilters = [
@@ -15,6 +16,7 @@ const categoryFilters = [
   { value: 'cli', label: 'CLI' },
   { value: 'devops', label: 'DevOps' },
   { value: 'security', label: 'Security' },
+  { value: 'image', label: 'Image' },
 ];
 
 function getParams() {

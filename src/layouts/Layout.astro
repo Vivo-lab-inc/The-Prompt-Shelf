@@ -6,7 +6,7 @@ interface Props {
   description?: string;
 }
 
-const { title = 'The-Prompt-Shelf', description = 'Curated collection of AI coding rules and prompts.' } = Astro.props;
+const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGENTS.md — all on one shelf.' } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -20,7 +20,7 @@ const { title = 'The-Prompt-Shelf', description = 'Curated collection of AI codi
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The-Prompt-Shelf" />
-    <meta property="og:image" content="https://thepromptshelf.dev/og-default.svg" />
+    <meta property="og:image" content="https://thepromptshelf.dev/og-default.png" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:site" content="@yuto_lab_note" />
     <meta name="twitter:title" content={title} />
@@ -43,8 +43,16 @@ const { title = 'The-Prompt-Shelf', description = 'Curated collection of AI codi
     <nav class="sticky top-0 z-50 border-b border-border-subtle bg-bg/80 backdrop-blur-xl">
       <div class="max-w-[1400px] mx-auto px-6 h-14 flex items-center justify-between">
         <a href="/" class="flex items-center gap-2.5 group">
-          <span class="font-display font-semibold text-[15px] text-text-main group-hover:text-text-muted transition-colors">
-            The-Prompt-Shelf
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" class="w-[22px] h-[22px] text-white/60 group-hover:text-white/40 transition-colors">
+            <rect x="5.5" y="7" width="4.5" height="17" rx="1" stroke-width="1.8"/>
+            <rect x="11" y="4.5" width="3.5" height="19.5" rx="1" stroke-width="1.8"/>
+            <rect x="15.5" y="10" width="3" height="14" rx="0.8" stroke-width="1.8"/>
+            <rect x="19.5" y="6" width="4" height="18" rx="1" stroke-width="1.8"/>
+            <rect x="24" y="8.5" width="3" height="15.5" rx="0.8" stroke-width="1.8" transform="rotate(8 25.5 24)"/>
+            <line x1="3.5" y1="25" x2="28.5" y2="25" stroke-width="2.2"/>
+          </svg>
+          <span class="font-display font-semibold text-[15px] tracking-tight">
+            <span class="text-white">The-Prompt</span><span class="text-white/70">-Shelf</span>
           </span>
         </a>
         <div class="flex items-center gap-5 text-[13px] text-text-faint">

@@ -34,6 +34,25 @@ const categoryLabels: Record<string, string> = {
   'cli': 'CLI',
   'devops': 'DevOps',
   'security': 'Security',
+  'mobile': 'Mobile',
+  'data': 'Data / ML',
+  'game': 'Game',
+  'image': 'Image',
+};
+
+const isGitHub = rule.sourceUrl?.includes('github.com');
+const toolColor: Record<string, string> = {
+  'cursor': 'border-blue-500/20 text-blue-400/80',
+  'claude-code': 'border-orange-500/20 text-orange-400/80',
+  'agents-md': 'border-emerald-500/20 text-emerald-400/80',
+  'image-prompt': 'border-pink-500/20 text-pink-400/80',
+};
+const accentClass = toolColor[rule.tool] || toolColor['agents-md'];
+const spineColor: Record<string, string> = {
+  'cursor': 'bg-blue-500/40',
+  'claude-code': 'bg-orange-500/40',
+  'agents-md': 'bg-emerald-500/40',
+  'image-prompt': 'bg-pink-500/40',
 };
 ---
 
@@ -89,46 +108,11 @@ const categoryLabels: Record<string, string> = {
             </nav>
           </div>
 
-          <!-- Current rule info -->
+          <!-- Sidebar actions -->
           <div class="border-t border-border-subtle pt-6">
-            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-3">Details</h3>
-            <dl class="space-y-2 text-[12px]">
-              <div class="flex justify-between">
-                <dt class="text-text-faint">Language</dt>
-                <dd class="text-text-muted">{rule.language}</dd>
-              </div>
-              {rule.framework !== 'Any' && (
-                <div class="flex justify-between">
-                  <dt class="text-text-faint">Framework</dt>
-                  <dd class="text-text-muted">{rule.framework}</dd>
-                </div>
-              )}
-              <div class="flex justify-between">
-                <dt class="text-text-faint">Author</dt>
-                <dd class="text-text-muted">{rule.author}</dd>
-              </div>
-            </dl>
-
-            <div class="flex flex-wrap gap-1.5 mt-4">
-              {rule.tags.map((tag: string) => (
-                <a href={`/rules?q=${tag}`} class="text-[10px] px-2 py-[2px] rounded-full border border-border-subtle text-text-faint hover:text-text-muted transition-all">
-                  {tag}
-                </a>
-              ))}
-            </div>
-
-            {rule.sourceUrl && (
-              <div class="mt-4">
-                <a href={rule.sourceUrl} target="_blank" rel="noopener" class="text-[11px] text-text-faint hover:text-text-muted transition-colors flex items-center gap-1.5">
-                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-                  Source
-                </a>
-              </div>
-            )}
-
             <button
               id="copy-btn-sidebar"
-              class="w-full mt-5 py-2.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-[3px] text-[12px] text-text-main font-medium transition-colors tracking-wide"
+              class="w-full py-2.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-[3px] text-[12px] text-text-main font-medium transition-colors tracking-wide"
             >
               Copy to Clipboard
             </button>
@@ -149,59 +133,151 @@ const categoryLabels: Record<string, string> = {
       <!-- Main content -->
       <div>
         <!-- Breadcrumb -->
-        <nav class="flex items-center gap-2 text-[13px] text-text-faint mb-10 tracking-wide">
+        <nav class="flex items-center gap-2 text-[13px] text-text-faint mb-8 tracking-wide">
           <a href="/" class="hover:text-text-muted transition-colors">Home</a>
-          <span>/</span>
+          <span class="opacity-30">/</span>
           <a href="/rules" class="hover:text-text-muted transition-colors">Rules</a>
-          <span>/</span>
+          <span class="opacity-30">/</span>
           <span class="text-text-muted" data-en={rule.title} data-ja={rule.title_ja || rule.title}>{rule.title_ja || rule.title}</span>
         </nav>
 
-        <!-- Header -->
-        <div class="mb-8">
-          <div class="flex items-center gap-3 mb-4">
-            <span class="px-2.5 py-1 text-[10px] font-medium tracking-wider uppercase bg-white/[0.06] border border-white/[0.08] rounded-full text-text-main">
+        <!-- Header card -->
+        <div class="mb-8 p-6 bg-surface border border-border-subtle rounded-[4px] relative overflow-hidden">
+          <!-- Subtle accent glow at top -->
+          <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/[0.08] to-transparent"></div>
+
+          <div class="flex flex-wrap items-center gap-2.5 mb-5">
+            <span class:list={["px-3 py-1 text-[11px] font-medium tracking-wider uppercase rounded-full border", accentClass]}>
               {rule.format}
             </span>
-            <span class="text-[12px] text-text-faint flex items-center gap-1">
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" class="opacity-50"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              {rule.stars}
+            <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle">
+              {rule.language}
+            </span>
+            {rule.framework !== 'Any' && (
+              <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle">
+                {rule.framework}
+              </span>
+            )}
+            <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle capitalize">
+              {categoryLabels[rule.category] || rule.category}
             </span>
           </div>
 
           <h1 id="rule-title" class="font-display text-3xl font-medium tracking-tight text-text-main mb-3"
             data-en={rule.title} data-ja={rule.title_ja || rule.title}>{rule.title_ja || rule.title}</h1>
-          <p id="rule-desc" class="text-text-muted text-[15px] leading-relaxed"
+          <p id="rule-desc" class="text-text-muted text-[15px] leading-relaxed mb-5"
             data-en={rule.description} data-ja={rule.description_ja || rule.description}>{rule.description_ja || rule.description}</p>
+
+          <!-- Source & author -->
+          {rule.sourceUrl && (
+            <div class="flex items-center gap-3 pt-4 border-t border-border-subtle/50 mb-4">
+              {isGitHub && rule.author && !['awesome-cursorrules', 'Community'].includes(rule.author) && (
+                <img
+                  src={`https://github.com/${rule.author}.png?size=40`}
+                  alt={rule.author}
+                  class="w-8 h-8 rounded-full border border-border-subtle opacity-80"
+                  loading="lazy"
+                  onerror="this.style.display='none'"
+                />
+              )}
+              <div class="flex flex-col">
+                <a href={rule.sourceUrl} target="_blank" rel="noopener" class="flex items-center gap-1.5 text-[13px] text-text-muted hover:text-text-main transition-colors group">
+                  {isGitHub ? (
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" class="opacity-60 group-hover:opacity-90 transition-opacity"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
+                  ) : (
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-60 group-hover:opacity-90 transition-opacity"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                  )}
+                  <span class="underline underline-offset-2 decoration-white/10 group-hover:decoration-white/30 transition-colors font-medium">{rule.source}</span>
+                </a>
+                {rule.stars > 0 && (
+                  <span class="flex items-center gap-1 text-[12px] text-yellow-500/70 mt-0.5">
+                    <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    {rule.stars.toLocaleString()}
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1.5">
+            {rule.tags.map((tag: string) => (
+              <a href={`/rules?q=${tag}`} class="text-[10px] px-2 py-[2px] rounded-full border border-border-subtle text-text-faint hover:text-text-muted hover:border-border-strong transition-all">
+                {tag}
+              </a>
+            ))}
+          </div>
         </div>
 
-        <!-- Code block -->
-        <div class="relative">
-          <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-spine rounded-l-sm"></div>
+        <!-- Preview image (for image prompts) -->
+        {rule.tool === 'image-prompt' && (
+          <div class="mb-8 rounded-[4px] overflow-hidden border border-border-subtle bg-[#0c0c0c]">
+            <div class="flex items-center gap-2 px-5 py-3 border-b border-white/[0.04] bg-white/[0.015]">
+              <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-text-faint"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              <span class="text-[12px] text-text-faint">Generated Preview</span>
+            </div>
+            <div class="flex justify-center p-6">
+              <img
+                src={`/previews/${rule.id}.webp`}
+                alt={`Preview generated by ${rule.title}`}
+                class="max-h-[500px] rounded-sm"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        )}
 
-          <div class="bg-surface border border-border-subtle rounded-[3px] overflow-hidden">
-            <div class="flex items-center justify-between px-5 py-3 border-b border-border-subtle">
+        <!-- Code block -->
+        <div class="relative group/code">
+          <!-- Colored spine -->
+          <div class:list={["absolute left-0 top-0 bottom-0 w-1 rounded-l-sm transition-colors duration-300", spineColor[rule.tool] || 'bg-white/10']}></div>
+
+          <div class="bg-[#0c0c0c] border border-border-subtle rounded-[4px] overflow-hidden">
+            <!-- Toolbar -->
+            <div class="flex items-center justify-between px-5 py-3 border-b border-white/[0.04] bg-white/[0.015]">
               <div class="flex items-center gap-3">
+                <!-- Traffic light dots -->
+                <div class="flex gap-1.5 mr-2">
+                  <div class="w-[10px] h-[10px] rounded-full bg-white/[0.06]"></div>
+                  <div class="w-[10px] h-[10px] rounded-full bg-white/[0.06]"></div>
+                  <div class="w-[10px] h-[10px] rounded-full bg-white/[0.06]"></div>
+                </div>
                 <span class="text-[12px] text-text-faint font-mono">{rule.format}</span>
+                <span class="text-[11px] text-text-faint/30">·</span>
                 <span class="text-[11px] text-text-faint/50">{lineCount} lines</span>
               </div>
-              <button id="copy-btn" class="text-[12px] text-text-faint hover:text-text-muted transition-colors tracking-wide">
+              <button id="copy-btn" class="flex items-center gap-1.5 text-[12px] text-text-faint hover:text-text-muted transition-colors tracking-wide group/copy">
+                <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="opacity-50 group-hover/copy:opacity-80"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                 <span id="copy-text">Copy</span>
               </button>
             </div>
 
-            <div class="p-6 overflow-x-auto">
+            <!-- Code content -->
+            <div class="p-6 overflow-x-auto max-h-[600px] overflow-y-auto">
               <pre class="!bg-transparent !border-0 !p-0 !m-0 !rounded-none"><code class="text-[13px] leading-[1.8] font-mono text-text-muted whitespace-pre-wrap break-words">{rule.content}</code></pre>
             </div>
           </div>
         </div>
 
-        <!-- Source attribution -->
-        {rule.sourceUrl && (
-          <div class="mt-4 text-[12px] text-text-faint">
-            Source: <a href={rule.sourceUrl} target="_blank" rel="noopener" class="hover:text-text-muted transition-colors underline underline-offset-2">{rule.source}</a>
-          </div>
-        )}
+        <!-- Action bar below code - always visible -->
+        <div class="flex items-center gap-3 mt-4">
+          <button
+            id="copy-btn-mobile"
+            class="flex items-center gap-2 px-5 py-2.5 bg-white/[0.08] hover:bg-white/[0.14] border border-white/[0.1] rounded-[4px] text-[13px] text-text-main font-medium transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.04)]"
+          >
+            <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            Copy Rule
+          </button>
+          <a
+            href={`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`}
+            target="_blank"
+            rel="noopener"
+            class="flex items-center gap-2 px-5 py-2.5 bg-[#1a1a1a] hover:bg-[#222] border border-white/[0.08] rounded-[4px] text-[13px] text-text-muted hover:text-text-main font-medium transition-all"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            Share on X
+          </a>
+        </div>
 
         <!-- Related -->
         {related.length > 0 && (
@@ -225,16 +301,18 @@ const categoryLabels: Record<string, string> = {
         try {
           await navigator.clipboard.writeText(content);
           if (btnId === 'copy-btn') {
-            document.getElementById('copy-text').textContent = 'Copied';
+            document.getElementById('copy-text').textContent = 'Copied!';
             setTimeout(() => { document.getElementById('copy-text').textContent = 'Copy'; }, 2000);
           } else {
-            btn.textContent = 'Copied';
-            setTimeout(() => { btn.textContent = 'Copy to Clipboard'; }, 2000);
+            const original = btn.textContent;
+            btn.textContent = 'Copied!';
+            setTimeout(() => { btn.textContent = original; }, 2000);
           }
         } catch {}
       });
     }
     setupCopy('copy-btn');
     setupCopy('copy-btn-sidebar');
+    setupCopy('copy-btn-mobile');
   </script>
 </Layout>

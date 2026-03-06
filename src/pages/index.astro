@@ -3,7 +3,19 @@ import Layout from '../layouts/Layout.astro';
 import RuleCard from '../components/RuleCard';
 import rules from '../data/rules.json';
 
-const featured = rules.sort((a, b) => b.stars - a.stars);
+// Interleave image prompts evenly among code rules for visual variety
+const imageRules = rules.filter(r => r.tool === 'image-prompt');
+const codeRules = rules.filter(r => r.tool !== 'image-prompt').sort((a, b) => b.stars - a.stars);
+const featured: typeof rules = [];
+const interval = Math.max(1, Math.floor(codeRules.length / (imageRules.length + 1)));
+let imgIdx = 0;
+codeRules.forEach((r, i) => {
+  featured.push(r);
+  if (imgIdx < imageRules.length && (i + 1) % interval === 0) {
+    featured.push(imageRules[imgIdx++]);
+  }
+});
+while (imgIdx < imageRules.length) featured.push(imageRules[imgIdx++]);
 const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
 ---
 
@@ -19,14 +31,14 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
   <!-- Hero -->
   <header class="pt-24 pb-16 px-6 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="flex flex-col items-center text-center space-y-6">
-      <h1 class="font-display text-4xl md:text-[44px] font-medium tracking-tight text-text-main animate-in">
-        The-Prompt-Shelf
+      <h1 class="font-display text-4xl md:text-[44px] font-medium tracking-tight animate-in">
+        <span class="text-white">The-Prompt</span><span class="text-white/70">-Shelf</span>
       </h1>
       <p class="text-text-muted text-[15px] max-w-xl mx-auto leading-relaxed animate-in animate-in-delay-1" id="hero-desc"
-        data-en="A curated collection of system prompts, agent instructions, and context rules. Optimized for modern AI coding assistants."
-        data-ja="AIコーディングアシスタントのための、システムプロンプト・エージェント指示・コンテキストルールの厳選コレクション。"
+        data-en="CLAUDE.md, .cursorrules, AGENTS.md — all on one shelf."
+        data-ja="CLAUDE.md、.cursorrules、AGENTS.md ── すべて、ひとつの棚に。"
       >
-        AIコーディングアシスタントのための、システムプロンプト・エージェント指示・コンテキストルールの厳選コレクション。
+        CLAUDE.md、.cursorrules、AGENTS.md ── すべて、ひとつの棚に。
       </p>
 
       <!-- Search -->
@@ -39,7 +51,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
             type="text"
             id="hero-search"
             placeholder="Search rules, frameworks, languages..."
-            class="w-full pl-14 pr-14 py-4 bg-gradient-to-r from-[#181818] to-[#141414] border border-border-subtle rounded-full text-text-main placeholder:text-[#555] outline-none focus:border-border-strong text-[15px] transition-colors"
+            class="w-full pl-14 pr-14 py-4 bg-gradient-to-r from-[#1e1e1e] via-[#1a1a1a] to-[#161616] border border-white/[0.08] rounded-full text-text-main placeholder:text-[#666] outline-none focus:border-white/[0.15] focus:shadow-[0_0_30px_rgba(255,255,255,0.03)] text-[15px] transition-all"
           />
           <kbd class="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] text-text-faint/50 font-mono">/</kbd>
         </div>
@@ -49,7 +61,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
       <div class="flex flex-wrap items-center justify-center gap-2 pt-4 animate-in animate-in-delay-3">
         {filters.map((filter, i) => (
           <a
-            href={i === 0 ? '/rules' : `/rules?tool=${filter.toLowerCase().replace(' ', '-').replace('.', '')}`}
+            href={i === 0 ? '/rules' : filter === 'Image Prompts' ? '/rules?tool=image-prompt' : `/rules?tool=${filter.toLowerCase().replace(' ', '-').replace('.', '')}`}
             class:list={[
               "px-4 py-1.5 rounded-full text-[13px] tracking-wide transition-all duration-200 border",
               i === 0
@@ -64,48 +76,24 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
     </div>
   </header>
 
-  <!-- Coding Rules Section -->
-  <section class="px-6 pb-24 max-w-[1400px] mx-auto w-full relative z-10">
+  <!-- All Rules - Mixed Shelf -->
+  <section class="px-6 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-lg font-medium tracking-tight text-text-main">Coding Rules</h2>
-        <p class="text-[13px] text-text-faint mt-1 tracking-wide">CLAUDE.md, .cursorrules, AGENTS.md</p>
+        <h2 class="text-lg font-medium tracking-tight text-text-main">On the Shelf</h2>
+        <p class="text-[13px] text-text-faint mt-1 tracking-wide">{rules.length} rules · CLAUDE.md, .cursorrules, AGENTS.md, Image Prompts</p>
       </div>
       <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide">
-        View all
+        Browse all
       </a>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-14">
+    <div class="columns-1 md:columns-2 lg:columns-3 xl:columns-4 gap-6 [column-fill:_balance]">
       {featured.map(rule => (
-        <RuleCard client:load rule={rule} />
+        <div class="mb-6 break-inside-avoid">
+          <RuleCard client:load rule={rule} />
+        </div>
       ))}
-    </div>
-  </section>
-
-  <!-- Image Prompts Section (Coming Soon) -->
-  <section class="px-6 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
-    <div class="border-t border-border-subtle pt-16">
-      <div class="flex items-center gap-3 mb-3">
-        <h2 class="text-lg font-medium tracking-tight text-text-main">Image Prompts</h2>
-        <span class="px-2 py-0.5 text-[10px] tracking-widest uppercase text-text-faint border border-border-subtle rounded-full">Soon</span>
-      </div>
-      <p class="text-[13px] text-text-faint tracking-wide mb-10">
-        Midjourney, DALL-E, Stable Diffusion, Flux — curated prompts with generated results.
-      </p>
-
-      <!-- Placeholder cards -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-6 gap-y-6">
-        {[1, 2, 3, 4].map(() => (
-          <div class="bg-surface border border-border-subtle rounded-[3px] overflow-hidden opacity-40">
-            <div class="aspect-[4/3] bg-gradient-to-br from-white/[0.02] to-transparent"></div>
-            <div class="p-5 space-y-3">
-              <div class="h-3 w-3/4 bg-white/[0.04] rounded-full"></div>
-              <div class="h-2 w-1/2 bg-white/[0.03] rounded-full"></div>
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   </section>
 
