@@ -1,31 +1,33 @@
 #!/bin/bash
-# notify-search-engines.sh — デプロイ後にサーチエンジンに通知
-# IndexNow + Google/Bing Sitemap Ping
+# notify-search-engines.sh — デプロイ後にIndexNowでサーチエンジンに通知
 
 SITE_URL="https://thepromptshelf.dev"
 SITEMAP_URL="$SITE_URL/sitemap-index.xml"
 INDEXNOW_KEY="8397e05fd39843bcb9945bd5f13312ed"
 
-echo "=== Search Engine Notification ==="
+echo "=== Search Engine Notification (IndexNow) ==="
 echo "Site: $SITE_URL"
-echo "Sitemap: $SITEMAP_URL"
 echo ""
 
-# 1. IndexNow
-echo "--- IndexNow ---"
-URLS=$(curl -s "$SITEMAP_URL" | grep -oP '(?<=<loc>)[^<]+')
-SITEMAP_URLS=""
-for sm in $URLS; do
-  PAGE_URLS=$(curl -s "$sm" | grep -oP '(?<=<loc>)[^<]+')
-  SITEMAP_URLS="$SITEMAP_URLS $PAGE_URLS"
-done
-
-URL_ARRAY=$(echo $SITEMAP_URLS | tr ' ' '\n' | python3 -c "
-import sys, json
-urls = [l.strip() for l in sys.stdin if l.strip()]
-print(json.dumps(urls))
+# サイトマップから全URLを抽出（macOS互換）
+URL_ARRAY=$(curl -s "$SITEMAP_URL" | python3 -c "
+import sys, re, json, urllib.request
+content = sys.stdin.read()
+sub_sitemaps = re.findall(r'<loc>([^<]+)</loc>', content)
+all_urls = []
+for sm in sub_sitemaps:
+    try:
+        sm_content = urllib.request.urlopen(sm).read().decode()
+        all_urls.extend(re.findall(r'<loc>([^<]+)</loc>', sm_content))
+    except: pass
+if not all_urls:
+    all_urls = sub_sitemaps
+print(json.dumps(all_urls))
 ")
 
+echo "URLs to notify: $(echo "$URL_ARRAY" | python3 -c "import sys,json; print(len(json.loads(sys.stdin.read())))")"
+
+# IndexNow API にPOST
 RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://api.indexnow.org/IndexNow" \
   -H "Content-Type: application/json" \
   -d "{
@@ -37,18 +39,10 @@ RESPONSE=$(curl -s -w "\n%{http_code}" -X POST "https://api.indexnow.org/IndexNo
 
 HTTP_CODE=$(echo "$RESPONSE" | tail -1)
 echo "IndexNow response: HTTP $HTTP_CODE"
+if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "202" ]; then
+  echo "IndexNow: OK"
+else
+  echo "IndexNow: Warning"
+fi
 
-# 2. Google Sitemap Ping
-echo ""
-echo "--- Google Sitemap Ping ---"
-PING_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://www.google.com/ping?sitemap=$SITEMAP_URL")
-echo "Google Ping: HTTP $PING_RESPONSE"
-
-# 3. Bing Sitemap Ping
-echo ""
-echo "--- Bing Sitemap Ping ---"
-BING_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" "https://www.bing.com/ping?sitemap=$SITEMAP_URL")
-echo "Bing Ping: HTTP $BING_RESPONSE"
-
-echo ""
-echo "=== Notification Complete ==="
+echo "=== Done ==="
