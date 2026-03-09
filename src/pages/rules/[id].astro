@@ -171,13 +171,15 @@ const spineColor: Record<string, string> = {
             <span class:list={["px-3 py-1 text-[11px] font-medium tracking-wider uppercase rounded-full border", accentClass]}>
               {rule.format}
             </span>
-            <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle">
+            <a href={`/rules/lang/${rule.language.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+              class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle hover:text-text-muted hover:border-border-strong transition-colors">
               {rule.language}
-            </span>
+            </a>
             {rule.framework !== 'Any' && (
-              <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle">
+              <a href={`/rules/framework/${rule.framework.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle hover:text-text-muted hover:border-border-strong transition-colors">
                 {rule.framework}
-              </span>
+              </a>
             )}
             <span class="px-2.5 py-1 text-[11px] text-text-faint bg-white/[0.03] rounded-full border border-border-subtle capitalize">
               {categoryLabels[rule.category] || rule.category}
