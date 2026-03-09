@@ -156,8 +156,10 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
-      {popularRules.map(rule => (
-        <RuleCard client:visible rule={rule} />
+      {popularRules.map((rule, i) => (
+        <div class:list={[i >= 3 ? 'hidden md:block' : '']}>
+          <RuleCard client:visible rule={rule} />
+        </div>
       ))}
     </div>
 
@@ -240,9 +242,9 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
     </div>
   </section>
 
-  <!-- Browse by Language -->
+  <!-- Browse by Language (hidden on mobile) -->
   {topLangs.length > 0 && (
-  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+  <section class="hidden md:block px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="mb-8">
       <h2 class="text-lg font-medium tracking-tight text-text-main"
         data-en="Browse by Language" data-ja="言語で探す">Browse by Language</h2>
@@ -261,9 +263,9 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
   </section>
   )}
 
-  <!-- Browse by Framework -->
+  <!-- Browse by Framework (hidden on mobile) -->
   {topFrameworks.length > 0 && (
-  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+  <section class="hidden md:block px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="mb-8">
       <h2 class="text-lg font-medium tracking-tight text-text-main"
         data-en="Browse by Framework" data-ja="フレームワークで探す">Browse by Framework</h2>
@@ -298,19 +300,21 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
-      {recentRules.map(rule => (
-        <RuleCard client:visible rule={rule} />
+      {recentRules.map((rule, i) => (
+        <div class:list={[i >= 2 ? 'hidden md:block' : '']}>
+          <RuleCard client:visible rule={rule} />
+        </div>
       ))}
     </div>
   </section>
 
   <!-- Divider -->
-  <div class="max-w-[1400px] mx-auto px-6 relative z-10">
+  <div class="hidden md:block max-w-[1400px] mx-auto px-6 relative z-10">
     <div class="border-t border-border-subtle"></div>
   </div>
 
-  <!-- All Rules - Mixed Shelf -->
-  <section class="px-6 py-16 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
+  <!-- All Rules - Mixed Shelf (hidden on mobile) -->
+  <section class="hidden md:block px-6 py-16 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="flex items-center justify-between mb-8">
       <div>
         <h2 class="text-lg font-medium tracking-tight text-text-main"
