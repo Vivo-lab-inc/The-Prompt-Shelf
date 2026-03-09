@@ -1,0 +1,197 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import RuleCard from '../../../components/RuleCard';
+import rules from '../../../data/rules.json';
+
+export function getStaticPaths() {
+  const langCounts: Record<string, number> = {};
+  rules.forEach(r => {
+    langCounts[r.language] = (langCounts[r.language] || 0) + 1;
+  });
+
+  return Object.entries(langCounts)
+    .filter(([, count]) => count >= 2)
+    .map(([language]) => ({
+      params: { language: language.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '') },
+      props: {
+        language,
+        matchingRules: rules
+          .filter(r => r.language === language)
+          .sort((a, b) => b.stars - a.stars),
+      },
+    }));
+}
+
+const { language, matchingRules } = Astro.props;
+const pageTitle = `${language} AI Coding Rules — The Prompt Shelf`;
+const pageDescription = `Browse curated ${language} rules for Claude Code, Cursor and more.`;
+const canonicalUrl = `https://thepromptshelf.dev/rules/lang/${Astro.params.language}`;
+
+const toolCounts = {
+  'claude-code': rules.filter(r => r.tool === 'claude-code').length,
+  'cursor': rules.filter(r => r.tool === 'cursor').length,
+  'agents-md': rules.filter(r => r.tool === 'agents-md').length,
+};
+const categoryCounts: Record<string, number> = {};
+rules.forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
+
+const categoryLabels: Record<string, string> = {
+  'web-frontend': 'Frontend',
+  'backend': 'Backend',
+  'cli': 'CLI',
+  'devops': 'DevOps',
+  'security': 'Security',
+  'mobile': 'Mobile',
+  'data': 'Data / ML',
+  'game': 'Game',
+  'image': 'Image',
+};
+
+// Collect all languages (2+) for sidebar
+const allLangs: Record<string, number> = {};
+rules.forEach(r => { allLangs[r.language] = (allLangs[r.language] || 0) + 1; });
+const langList = Object.entries(allLangs)
+  .filter(([, c]) => c >= 2)
+  .sort((a, b) => b[1] - a[1]);
+---
+
+<Layout title={pageTitle} description={pageDescription}>
+  <!-- JSON-LD: BreadcrumbList -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://thepromptshelf.dev/" },
+      { "@type": "ListItem", "position": 2, "name": "Rules", "item": "https://thepromptshelf.dev/rules" },
+      { "@type": "ListItem", "position": 3, "name": language, "item": canonicalUrl }
+    ]
+  })} />
+  <!-- JSON-LD: CollectionPage -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": pageTitle,
+    "description": pageDescription,
+    "url": canonicalUrl,
+    "numberOfItems": matchingRules.length
+  })} />
+
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="bg-grid absolute inset-0"></div>
+    <div class="bg-noise absolute inset-0"></div>
+  </div>
+
+  <div class="max-w-[1400px] mx-auto px-6 py-10 relative z-10">
+    <div class="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-10">
+
+      <!-- Sidebar -->
+      <aside class="hidden lg:block">
+        <div class="sticky top-24 space-y-8">
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">Browse</h3>
+            <nav class="space-y-1">
+              <a href="/rules" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-all">
+                <span>All Rules</span>
+                <span class="text-text-faint text-[11px]">{rules.length}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Tool</h3>
+            <nav class="space-y-1">
+              <a href="/rules?tool=claude-code" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-all">
+                <span>CLAUDE.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['claude-code']}</span>
+              </a>
+              <a href="/rules?tool=cursor" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-all">
+                <span>.cursorrules</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['cursor']}</span>
+              </a>
+              <a href="/rules?tool=agents-md" class="sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-all">
+                <span>AGENTS.md</span>
+                <span class="text-text-faint text-[11px]">{toolCounts['agents-md']}</span>
+              </a>
+            </nav>
+          </div>
+
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Language</h3>
+            <nav class="space-y-1">
+              {langList.map(([lang, count]) => (
+                <a href={`/rules/lang/${lang.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                  class:list={["sidebar-link flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] transition-all",
+                    lang === language ? 'text-text-main bg-white/[0.04] border border-border-subtle' : 'text-text-muted hover:text-text-main hover:bg-white/[0.03]']}>
+                  <span>{lang}</span>
+                  <span class="text-text-faint text-[11px]">{count}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main content -->
+      <div>
+        <!-- Breadcrumb -->
+        <nav class="flex items-center gap-2 text-[13px] text-text-faint mb-8 tracking-wide">
+          <a href="/" class="hover:text-text-muted transition-colors">Home</a>
+          <span class="opacity-30">/</span>
+          <a href="/rules" class="hover:text-text-muted transition-colors">Rules</a>
+          <span class="opacity-30">/</span>
+          <span class="text-text-muted">{language}</span>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-10">
+          <h1 class="font-display text-3xl font-medium tracking-tight text-text-main mb-3"
+            data-en={`${language} AI Coding Rules`}
+            data-ja={`${language} AI コーディングルール`}>{language} AI Coding Rules</h1>
+          <p class="text-text-muted text-[15px] leading-relaxed"
+            data-en={`Browse curated ${language} rules for Claude Code, Cursor and more. ${matchingRules.length} rules available.`}
+            data-ja={`Claude Code、Cursor などで使える ${language} ルールを厳選。全 ${matchingRules.length} 件。`}>Browse curated {language} rules for Claude Code, Cursor and more. {matchingRules.length} rules available.</p>
+        </div>
+
+        <!-- Rule cards grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-14">
+          {matchingRules.map(r => (
+            <RuleCard client:visible rule={r} />
+          ))}
+        </div>
+
+        <!-- Browse More CTA -->
+        <section class="mt-16 pt-10 border-t border-border-subtle">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="flex-1">
+              <h3 class="text-[15px] font-medium text-text-main mb-1"
+                data-en="Explore more rules" data-ja="もっとルールを探す">Explore more rules</h3>
+              <p class="text-[13px] text-text-faint"
+                data-en={`Browse all ${rules.length} rules across CLAUDE.md, .cursorrules, AGENTS.md and Image Prompts.`}
+                data-ja={`CLAUDE.md、.cursorrules、AGENTS.md、Image Prompts の全 ${rules.length} ルールをチェック。`}>Browse all {rules.length} rules across CLAUDE.md, .cursorrules, AGENTS.md and Image Prompts.</p>
+            </div>
+            <a href="/rules"
+              class="px-5 py-2.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-[4px] text-[13px] text-text-main font-medium transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.04)]"
+              data-en="Browse All" data-ja="すべて見る">Browse All</a>
+          </div>
+        </section>
+
+        <!-- Mobile Navigation -->
+        <section class="mt-10 lg:hidden">
+          <div class="p-5 bg-surface border border-border-subtle rounded-[4px]">
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="Other Languages" data-ja="他の言語">Other Languages</h3>
+            <div class="flex flex-wrap gap-2">
+              {langList.map(([lang, count]) => (
+                <a href={`/rules/lang/${lang.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+                  class:list={["px-3 py-1.5 text-[12px] border rounded-full transition-colors",
+                    lang === language ? 'text-text-main border-white/20 bg-white/[0.06]' : 'text-text-muted border-border-subtle hover:bg-white/[0.04] hover:text-text-main']}>
+                  {lang} <span class="text-text-faint">({count})</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</Layout>

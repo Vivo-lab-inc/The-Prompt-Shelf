@@ -45,7 +45,7 @@ while (imgIdx < imageRules.length) featured.push(imageRules[imgIdx++]);
 const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
 ---
 
-<Layout title="The-Prompt-Shelf — Curated AI Rules & Prompts" description="A curated collection of system prompts, agent instructions, and context rules for modern AI coding assistants.">
+<Layout title="The-Prompt-Shelf — Curated AI Rules & Prompts" description="Curated collection of AI coding rules for Claude Code, Cursor, and more. Browse 95+ system prompts, .cursorrules, CLAUDE.md, and AGENTS.md files from top GitHub repositories.">
 
   <!-- Background layers -->
   <div class="fixed inset-0 pointer-events-none z-0">
@@ -66,6 +66,12 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
       >
         CLAUDE.md、.cursorrules、AGENTS.md ── すべて、ひとつの棚に。
       </p>
+      <p class="text-text-faint text-[13px] max-w-lg mx-auto leading-relaxed animate-in animate-in-delay-1"
+        data-en={`Browse ${rules.length}+ curated AI coding rules — ready to copy & paste.`}
+        data-ja={`${rules.length}件以上の厳選AIコーディングルールをブラウズ。コピペですぐ使えます。`}
+      >
+        {rules.length}件以上の厳選AIコーディングルールをブラウズ。コピペですぐ使えます。
+      </p>
 
       <!-- Search -->
       <div class="w-full max-w-2xl pt-6 animate-in animate-in-delay-2">
@@ -76,7 +82,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
           <input
             type="text"
             id="hero-search"
-            placeholder="Search rules, frameworks, languages..."
+            placeholder="Search rules... e.g. Next.js, Python, Claude"
             class="w-full pl-14 pr-14 py-4 bg-gradient-to-r from-[#1e1e1e] via-[#1a1a1a] to-[#161616] border border-white/[0.08] rounded-full text-text-main placeholder:text-[#666] outline-none focus:border-white/[0.15] focus:shadow-[0_0_30px_rgba(255,255,255,0.03)] text-[15px] transition-all"
           />
           <kbd class="absolute right-6 top-1/2 -translate-y-1/2 text-[11px] text-text-faint/50 font-mono">/</kbd>
@@ -99,6 +105,19 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
           </a>
         ))}
       </div>
+
+      <!-- Popular search tags -->
+      <div class="flex flex-wrap items-center justify-center gap-2 pt-3 animate-in animate-in-delay-3">
+        <span class="text-[11px] text-text-faint/50 mr-1" data-en="Popular:" data-ja="人気:">Popular:</span>
+        {['Next.js', 'TypeScript', 'Python', 'React', 'Tailwind', 'Astro'].map(tag => (
+          <a
+            href={`/rules?q=${encodeURIComponent(tag)}`}
+            class="px-2.5 py-1 rounded-full text-[11px] text-text-faint hover:text-text-muted bg-white/[0.03] hover:bg-white/[0.06] border border-white/[0.04] hover:border-white/[0.08] transition-all duration-200"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
     </div>
   </header>
 
@@ -109,7 +128,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
         <h2 class="text-lg font-medium tracking-tight text-text-main"
           data-en="Popular Rules" data-ja="人気のルール">人気のルール</h2>
         <p class="text-[13px] text-text-faint mt-1 tracking-wide"
-          data-en="Most starred rules from the community" data-ja="コミュニティで最もスターの多いルール">コミュニティで最もスターの多いルール</p>
+          data-en="Most starred rules from the community — copied by thousands of developers" data-ja="コミュニティで最もスターの多いルール — 数千人の開発者がコピー">コミュニティで最もスターの多いルール — 数千人の開発者がコピー</p>
       </div>
       <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide flex items-center gap-1 group">
         <span data-en="View all" data-ja="すべて見る">すべて見る</span>
@@ -121,6 +140,13 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
       {popularRules.map(rule => (
         <RuleCard client:visible rule={rule} />
       ))}
+    </div>
+
+    <div class="flex justify-center mt-10">
+      <a href="/rules" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-full text-[13px] font-medium text-text-main bg-white/[0.06] border border-white/[0.08] hover:bg-white/[0.10] hover:border-white/[0.15] transition-all duration-200 group">
+        <span data-en={`Browse all ${rules.length} rules`} data-ja={`${rules.length}件のルールをすべて見る`}>{`Browse all ${rules.length} rules`}</span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="group-hover:translate-x-0.5 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
     </div>
   </section>
 
@@ -202,7 +228,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
         <h2 class="text-lg font-medium tracking-tight text-text-main"
           data-en="Recently Added" data-ja="最近追加されたルール">最近追加されたルール</h2>
         <p class="text-[13px] text-text-faint mt-1 tracking-wide"
-          data-en="Fresh additions to the shelf" data-ja="棚に新しく追加されたルール">棚に新しく追加されたルール</p>
+          data-en="Fresh additions to the shelf — updated daily from GitHub" data-ja="棚に新しく追加されたルール — GitHubから毎日更新">棚に新しく追加されたルール — GitHubから毎日更新</p>
       </div>
       <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide flex items-center gap-1 group">
         <span data-en="View all" data-ja="すべて見る">すべて見る</span>

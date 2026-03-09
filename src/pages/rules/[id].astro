@@ -57,6 +57,27 @@ const spineColor: Record<string, string> = {
 ---
 
 <Layout title={`${rule.title} - The-Prompt-Shelf`} description={rule.description}>
+  <!-- JSON-LD: SoftwareSourceCode -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    "name": rule.title,
+    "description": rule.description,
+    "programmingLanguage": rule.language,
+    ...(rule.author && { "author": { "@type": "Person", "name": rule.author } }),
+    ...(rule.sourceUrl && { "codeRepository": rule.sourceUrl }),
+    "url": `https://thepromptshelf.dev/rules/${rule.id}`
+  })} />
+  <!-- JSON-LD: BreadcrumbList -->
+  <script type="application/ld+json" set:html={JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://thepromptshelf.dev/" },
+      { "@type": "ListItem", "position": 2, "name": "Rules", "item": "https://thepromptshelf.dev/rules" },
+      { "@type": "ListItem", "position": 3, "name": rule.title, "item": `https://thepromptshelf.dev/rules/${rule.id}` }
+    ]
+  })} />
   <div class="fixed inset-0 pointer-events-none z-0">
     <div class="bg-grid absolute inset-0"></div>
     <div class="bg-noise absolute inset-0"></div>

@@ -28,6 +28,24 @@ const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGEN
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <title>{title}</title>
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "The-Prompt-Shelf",
+      "url": "https://thepromptshelf.dev",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://thepromptshelf.dev/rules?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    })} />
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "The-Prompt-Shelf",
+      "url": "https://thepromptshelf.dev"
+    })} />
     <!-- Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2535GY448D"></script>
     <script is:inline>
