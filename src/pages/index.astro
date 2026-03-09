@@ -3,6 +3,32 @@ import Layout from '../layouts/Layout.astro';
 import RuleCard from '../components/RuleCard';
 import rules from '../data/rules.json';
 
+// Popular rules (top 6 by stars)
+const popularRules = [...rules].sort((a, b) => b.stars - a.stars).slice(0, 6);
+
+// Recently added (last 4, assuming later entries in JSON are newer)
+const recentRules = [...rules].slice(-4).reverse();
+
+// Category data for quick browse section
+const categoryLabels: Record<string, { label: string; labelJa: string; icon: string }> = {
+  'web-frontend': { label: 'Frontend', labelJa: 'フロントエンド', icon: 'M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z' },
+  'backend': { label: 'Backend', labelJa: 'バックエンド', icon: 'M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2' },
+  'mobile': { label: 'Mobile', labelJa: 'モバイル', icon: 'M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z' },
+  'cli': { label: 'CLI / Tools', labelJa: 'CLI / ツール', icon: 'M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z' },
+  'devops': { label: 'DevOps', labelJa: 'DevOps', icon: 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z' },
+  'image': { label: 'Image', labelJa: '画像生成', icon: 'M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z' },
+};
+const categoryCounts: Record<string, number> = {};
+rules.forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
+
+// Tool counts for quick stats
+const toolCounts = {
+  'claude-code': rules.filter(r => r.tool === 'claude-code').length,
+  'cursor': rules.filter(r => r.tool === 'cursor').length,
+  'agents-md': rules.filter(r => r.tool === 'agents-md').length,
+  'image-prompt': rules.filter(r => r.tool === 'image-prompt').length,
+};
+
 // Interleave image prompts evenly among code rules for visual variety
 const imageRules = rules.filter(r => r.tool === 'image-prompt');
 const codeRules = rules.filter(r => r.tool !== 'image-prompt').sort((a, b) => b.stars - a.stars);
@@ -61,7 +87,7 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
       <div class="flex flex-wrap items-center justify-center gap-2 pt-4 animate-in animate-in-delay-3">
         {filters.map((filter, i) => (
           <a
-            href={i === 0 ? '/rules' : filter === 'Image Prompts' ? '/rules?tool=image-prompt' : `/rules?tool=${filter.toLowerCase().replace(' ', '-').replace('.', '')}`}
+            href={i === 0 ? '/rules' : filter === 'Image Prompts' ? '/rules?tool=image-prompt' : filter === 'Agents.md' ? '/rules?tool=agents-md' : `/rules?tool=${filter.toLowerCase().replace(' ', '-').replace('.', '')}`}
             class:list={[
               "px-4 py-1.5 rounded-full text-[13px] tracking-wide transition-all duration-200 border",
               i === 0
@@ -76,15 +102,137 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
     </div>
   </header>
 
-  <!-- All Rules - Mixed Shelf -->
-  <section class="px-6 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
+  <!-- Popular Rules -->
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
     <div class="flex items-center justify-between mb-8">
       <div>
-        <h2 class="text-lg font-medium tracking-tight text-text-main">On the Shelf</h2>
+        <h2 class="text-lg font-medium tracking-tight text-text-main"
+          data-en="Popular Rules" data-ja="人気のルール">人気のルール</h2>
+        <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+          data-en="Most starred rules from the community" data-ja="コミュニティで最もスターの多いルール">コミュニティで最もスターの多いルール</p>
+      </div>
+      <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide flex items-center gap-1 group">
+        <span data-en="View all" data-ja="すべて見る">すべて見る</span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="group-hover:translate-x-0.5 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-14">
+      {popularRules.map(rule => (
+        <RuleCard client:visible rule={rule} />
+      ))}
+    </div>
+  </section>
+
+  <!-- Browse by Category -->
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="mb-8">
+      <h2 class="text-lg font-medium tracking-tight text-text-main"
+        data-en="Browse by Category" data-ja="カテゴリで探す">カテゴリで探す</h2>
+      <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+        data-en="Find rules for your stack" data-ja="あなたのスタックに合ったルールを探す">あなたのスタックに合ったルールを探す</p>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      {Object.entries(categoryLabels).filter(([cat]) => categoryCounts[cat]).map(([cat, meta]) => (
+        <a href={`/rules?category=${cat}`}
+          class="group flex flex-col items-center gap-3 p-5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-border-strong transition-all duration-300 hover:-translate-y-[2px]">
+          <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="text-text-faint group-hover:text-text-muted transition-colors">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={meta.icon}/>
+          </svg>
+          <span class="text-[13px] text-text-muted group-hover:text-text-main transition-colors font-medium"
+            data-en={meta.label} data-ja={meta.labelJa}>{meta.labelJa}</span>
+          <span class="text-[11px] text-text-faint">{categoryCounts[cat]} rules</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <!-- Browse by Tool -->
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="mb-8">
+      <h2 class="text-lg font-medium tracking-tight text-text-main"
+        data-en="Browse by Tool" data-ja="ツールで探す">ツールで探す</h2>
+    </div>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <a href="/rules?tool=claude-code" class="group flex items-center gap-4 p-5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-orange-500/20 transition-all duration-300">
+        <div class="w-10 h-10 rounded-full bg-orange-500/10 border border-orange-500/20 flex items-center justify-center shrink-0">
+          <span class="text-orange-400 text-[14px] font-mono font-bold">C</span>
+        </div>
+        <div>
+          <span class="text-[14px] text-text-main font-medium block">CLAUDE.md</span>
+          <span class="text-[12px] text-text-faint">{toolCounts['claude-code']} rules</span>
+        </div>
+      </a>
+      <a href="/rules?tool=cursor" class="group flex items-center gap-4 p-5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-blue-500/20 transition-all duration-300">
+        <div class="w-10 h-10 rounded-full bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+          <span class="text-blue-400 text-[14px] font-mono font-bold">.c</span>
+        </div>
+        <div>
+          <span class="text-[14px] text-text-main font-medium block">.cursorrules</span>
+          <span class="text-[12px] text-text-faint">{toolCounts['cursor']} rules</span>
+        </div>
+      </a>
+      <a href="/rules?tool=agents-md" class="group flex items-center gap-4 p-5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-emerald-500/20 transition-all duration-300">
+        <div class="w-10 h-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0">
+          <span class="text-emerald-400 text-[14px] font-mono font-bold">A</span>
+        </div>
+        <div>
+          <span class="text-[14px] text-text-main font-medium block">AGENTS.md</span>
+          <span class="text-[12px] text-text-faint">{toolCounts['agents-md']} rules</span>
+        </div>
+      </a>
+      <a href="/rules?tool=image-prompt" class="group flex items-center gap-4 p-5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-pink-500/20 transition-all duration-300">
+        <div class="w-10 h-10 rounded-full bg-pink-500/10 border border-pink-500/20 flex items-center justify-center shrink-0">
+          <span class="text-pink-400 text-[14px] font-mono font-bold">I</span>
+        </div>
+        <div>
+          <span class="text-[14px] text-text-main font-medium block">Image Prompts</span>
+          <span class="text-[12px] text-text-faint">{toolCounts['image-prompt']} rules</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- Recently Added -->
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-lg font-medium tracking-tight text-text-main"
+          data-en="Recently Added" data-ja="最近追加されたルール">最近追加されたルール</h2>
+        <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+          data-en="Fresh additions to the shelf" data-ja="棚に新しく追加されたルール">棚に新しく追加されたルール</p>
+      </div>
+      <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide flex items-center gap-1 group">
+        <span data-en="View all" data-ja="すべて見る">すべて見る</span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="group-hover:translate-x-0.5 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-6 gap-y-14">
+      {recentRules.map(rule => (
+        <RuleCard client:visible rule={rule} />
+      ))}
+    </div>
+  </section>
+
+  <!-- Divider -->
+  <div class="max-w-[1400px] mx-auto px-6 relative z-10">
+    <div class="border-t border-border-subtle"></div>
+  </div>
+
+  <!-- All Rules - Mixed Shelf -->
+  <section class="px-6 py-16 pb-32 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h2 class="text-lg font-medium tracking-tight text-text-main"
+          data-en="All Rules" data-ja="すべてのルール">すべてのルール</h2>
         <p class="text-[13px] text-text-faint mt-1 tracking-wide">{rules.length} rules · CLAUDE.md, .cursorrules, AGENTS.md, Image Prompts</p>
       </div>
-      <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide">
-        Browse all
+      <a href="/rules" class="text-[13px] text-text-faint hover:text-text-muted transition-colors tracking-wide flex items-center gap-1 group">
+        <span data-en="Browse with filters" data-ja="フィルター付きで見る">フィルター付きで見る</span>
+        <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24" class="group-hover:translate-x-0.5 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
       </a>
     </div>
 

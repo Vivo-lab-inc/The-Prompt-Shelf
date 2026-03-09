@@ -55,7 +55,9 @@ const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGEN
           </span>
         </a>
         <div class="flex items-center gap-5 text-[13px] text-text-faint">
-          <a href="/rules" class="hover:text-text-muted transition-colors tracking-wide">Browse</a>
+          <a href="/rules" class="hover:text-text-muted transition-colors tracking-wide font-medium">Browse</a>
+          <a href="/rules?tool=claude-code" class="hidden md:inline hover:text-text-muted transition-colors tracking-wide">CLAUDE.md</a>
+          <a href="/rules?tool=cursor" class="hidden md:inline hover:text-text-muted transition-colors tracking-wide">.cursorrules</a>
           <a href="/about" class="hover:text-text-muted transition-colors tracking-wide">About</a>
           <a href="https://github.com/Vivo-lab-inc/The-Prompt-Shelf" target="_blank" class="hover:text-text-muted transition-colors">
             <svg viewBox="0 0 16 16" fill="currentColor" class="w-[18px] h-[18px]"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
@@ -71,15 +73,95 @@ const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGEN
       <slot />
     </main>
 
-    <footer class="border-t border-border-subtle py-10 px-6 mt-auto">
-      <div class="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-text-faint tracking-wide">
-        <p>The-Prompt-Shelf</p>
-        <div class="flex gap-6">
-          <a href="/about" class="hover:text-text-muted transition-colors">About</a>
-          <a href="https://github.com/Vivo-lab-inc/The-Prompt-Shelf" target="_blank" class="hover:text-text-muted transition-colors">GitHub</a>
+    <footer class="border-t border-border-subtle py-14 px-6 mt-auto">
+      <div class="max-w-[1400px] mx-auto">
+        <!-- Footer navigation grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-10">
+          <!-- Browse -->
+          <div>
+            <h4 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="Browse" data-ja="ブラウズ">ブラウズ</h4>
+            <nav class="space-y-2.5">
+              <a href="/rules" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">All Rules</a>
+              <a href="/rules?tool=claude-code" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">CLAUDE.md</a>
+              <a href="/rules?tool=cursor" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">.cursorrules</a>
+              <a href="/rules?tool=agents-md" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">AGENTS.md</a>
+              <a href="/rules?tool=image-prompt" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Image Prompts</a>
+            </nav>
+          </div>
+
+          <!-- Categories -->
+          <div>
+            <h4 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="Categories" data-ja="カテゴリ">カテゴリ</h4>
+            <nav class="space-y-2.5">
+              <a href="/rules?category=web-frontend" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Frontend</a>
+              <a href="/rules?category=backend" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Backend</a>
+              <a href="/rules?category=mobile" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Mobile</a>
+              <a href="/rules?category=devops" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">DevOps</a>
+              <a href="/rules?category=cli" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">CLI / Tools</a>
+            </nav>
+          </div>
+
+          <!-- Popular -->
+          <div>
+            <h4 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="Popular" data-ja="人気">人気</h4>
+            <nav class="space-y-2.5">
+              <a href="/rules?q=TypeScript" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">TypeScript</a>
+              <a href="/rules?q=React" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">React</a>
+              <a href="/rules?q=Next.js" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Next.js</a>
+              <a href="/rules?q=Python" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Python</a>
+              <a href="/rules?q=Flutter" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Flutter</a>
+            </nav>
+          </div>
+
+          <!-- About -->
+          <div>
+            <h4 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="About" data-ja="情報">情報</h4>
+            <nav class="space-y-2.5">
+              <a href="/about" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">About</a>
+              <a href="https://github.com/Vivo-lab-inc/The-Prompt-Shelf" target="_blank" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">GitHub</a>
+            </nav>
+          </div>
+        </div>
+
+        <!-- Bottom bar -->
+        <div class="pt-6 border-t border-border-subtle flex flex-col md:flex-row items-center justify-between gap-4 text-[13px] text-text-faint tracking-wide">
+          <a href="/" class="hover:text-text-muted transition-colors">The-Prompt-Shelf</a>
+          <p class="text-[12px] text-text-faint/60">CLAUDE.md, .cursorrules, AGENTS.md &mdash; all on one shelf.</p>
         </div>
       </div>
     </footer>
+    <!-- Back to top button -->
+    <button
+      id="back-to-top"
+      class="fixed bottom-8 right-8 z-50 w-10 h-10 rounded-full bg-surface border border-border-subtle text-text-faint hover:text-text-main hover:border-border-strong transition-all duration-300 opacity-0 pointer-events-none translate-y-4 flex items-center justify-center shadow-lg"
+      aria-label="Back to top"
+    >
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+    </button>
+
+    <script>
+      // Back to top button
+      const backToTopBtn = document.getElementById('back-to-top');
+      if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+          if (window.scrollY > 600) {
+            backToTopBtn.classList.remove('opacity-0', 'pointer-events-none', 'translate-y-4');
+            backToTopBtn.classList.add('opacity-100', 'pointer-events-auto', 'translate-y-0');
+          } else {
+            backToTopBtn.classList.add('opacity-0', 'pointer-events-none', 'translate-y-4');
+            backToTopBtn.classList.remove('opacity-100', 'pointer-events-auto', 'translate-y-0');
+          }
+        });
+        backToTopBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+    </script>
+
     <script>
       const langBtn = document.getElementById('lang-toggle');
       let lang = localStorage.getItem('lang') || 'ja';

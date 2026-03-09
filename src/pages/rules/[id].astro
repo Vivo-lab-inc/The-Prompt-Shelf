@@ -282,14 +282,65 @@ const spineColor: Record<string, string> = {
         <!-- Related -->
         {related.length > 0 && (
           <section class="mt-20 pt-12 border-t border-border-subtle">
-            <h2 class="text-lg font-medium mb-8 tracking-tight">Related Rules</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-6 gap-y-14">
-              {related.slice(0, 3).map(r => (
+            <div class="flex items-center justify-between mb-8">
+              <div>
+                <h2 class="text-lg font-medium tracking-tight"
+                  data-en="You might also like" data-ja="こちらもおすすめ">こちらもおすすめ</h2>
+                <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+                  data-en={`More ${categoryLabels[rule.category] || rule.category} rules`}
+                  data-ja={`${categoryLabels[rule.category] || rule.category} カテゴリの他のルール`}>{categoryLabels[rule.category] || rule.category} カテゴリの他のルール</p>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-x-6 gap-y-14">
+              {related.slice(0, 4).map(r => (
                 <RuleCard client:visible rule={r} />
               ))}
             </div>
           </section>
         )}
+
+        <!-- Browse More CTA -->
+        <section class="mt-16 pt-10 border-t border-border-subtle">
+          <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            <div class="flex-1">
+              <h3 class="text-[15px] font-medium text-text-main mb-1"
+                data-en="Explore more rules" data-ja="もっとルールを探す">もっとルールを探す</h3>
+              <p class="text-[13px] text-text-faint"
+                data-en={`Browse all ${rules.length} rules across CLAUDE.md, .cursorrules, AGENTS.md and Image Prompts.`}
+                data-ja={`CLAUDE.md、.cursorrules、AGENTS.md、Image Prompts の全 ${rules.length} ルールをチェック。`}>CLAUDE.md、.cursorrules、AGENTS.md、Image Prompts の全 {rules.length} ルールをチェック。</p>
+            </div>
+            <div class="flex gap-3 shrink-0">
+              <a href={`/rules?category=${rule.category}`}
+                class="px-5 py-2.5 bg-white/[0.06] hover:bg-white/[0.1] border border-white/[0.08] rounded-[4px] text-[13px] text-text-main font-medium transition-all hover:shadow-[0_0_20px_rgba(255,255,255,0.04)]"
+                data-en={`More ${categoryLabels[rule.category] || rule.category}`}
+                data-ja={`${categoryLabels[rule.category] || rule.category} をもっと見る`}>{categoryLabels[rule.category] || rule.category} をもっと見る</a>
+              <a href="/rules"
+                class="px-5 py-2.5 bg-transparent hover:bg-white/[0.04] border border-border-subtle rounded-[4px] text-[13px] text-text-muted hover:text-text-main font-medium transition-all"
+                data-en="Browse All" data-ja="すべて見る">すべて見る</a>
+            </div>
+          </div>
+        </section>
+
+        <!-- Mobile Category Navigation (visible on mobile where sidebar is hidden) -->
+        <section class="mt-10 lg:hidden">
+          <div class="p-5 bg-surface border border-border-subtle rounded-[4px]">
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
+              data-en="Quick Navigation" data-ja="クイックナビゲーション">クイックナビゲーション</h3>
+            <div class="flex flex-wrap gap-2">
+              <a href="/rules?tool=claude-code" class="px-3 py-1.5 text-[12px] text-orange-400/80 border border-orange-500/20 rounded-full hover:bg-orange-500/10 transition-colors">CLAUDE.md</a>
+              <a href="/rules?tool=cursor" class="px-3 py-1.5 text-[12px] text-blue-400/80 border border-blue-500/20 rounded-full hover:bg-blue-500/10 transition-colors">.cursorrules</a>
+              <a href="/rules?tool=agents-md" class="px-3 py-1.5 text-[12px] text-emerald-400/80 border border-emerald-500/20 rounded-full hover:bg-emerald-500/10 transition-colors">AGENTS.md</a>
+              <a href="/rules?tool=image-prompt" class="px-3 py-1.5 text-[12px] text-pink-400/80 border border-pink-500/20 rounded-full hover:bg-pink-500/10 transition-colors">Image Prompts</a>
+            </div>
+            <div class="flex flex-wrap gap-2 mt-3 pt-3 border-t border-border-subtle/50">
+              {Object.entries(categoryCounts).map(([cat, count]) => (
+                <a href={`/rules?category=${cat}`} class="px-3 py-1.5 text-[12px] text-text-muted border border-border-subtle rounded-full hover:bg-white/[0.04] hover:text-text-main transition-colors">
+                  {categoryLabels[cat] || cat} <span class="text-text-faint">({count})</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
       </div>
     </div>
   </div>
