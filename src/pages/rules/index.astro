@@ -35,7 +35,7 @@ const categoryLabels: Record<string, string> = {
 };
 ---
 
-<Layout title="Browse the Shelf - The-Prompt-Shelf" description="Browse 95+ AI coding rules and system prompts. Filter by tool (CLAUDE.md, .cursorrules, AGENTS.md), programming language, and category. Find the perfect rules for your AI coding workflow.">
+<Layout title="AI Coding Rules — The Prompt Shelf" description="Browse 95+ AI coding rules and system prompts. Filter by tool (CLAUDE.md, .cursorrules, AGENTS.md), programming language, and category. Find the perfect rules for your AI coding workflow.">
   <!-- Background -->
   <div class="fixed inset-0 pointer-events-none z-0">
     <div class="bg-grid absolute inset-0"></div>
@@ -138,8 +138,11 @@ const categoryLabels: Record<string, string> = {
       <!-- Main content -->
       <div>
         <div class="mb-8">
-          <h1 class="text-2xl font-medium tracking-tight text-text-main mb-1">Browse the Shelf</h1>
-          <p class="text-[13px] text-text-faint tracking-wide">Discover AI coding rules for every tool and stack</p>
+          <h1 class="text-2xl font-medium tracking-tight text-text-main mb-1"
+            data-en="AI Coding Rules" data-ja="AI コーディングルール">AI Coding Rules</h1>
+          <p class="text-[13px] text-text-faint tracking-wide"
+            data-en={`${rules.length}+ rules for Claude Code, Cursor, and more`}
+            data-ja={`Claude Code、Cursor など ${rules.length}件以上のルール`}>{rules.length}+ rules for Claude Code, Cursor, and more</p>
         </div>
 
         <SearchAndFilter client:load rules={rules} />
