@@ -12,6 +12,15 @@ const categoryCounts: Record<string, number> = {};
 rules.forEach(r => { categoryCounts[r.category] = (categoryCounts[r.category] || 0) + 1; });
 const languageCounts: Record<string, number> = {};
 rules.forEach(r => { languageCounts[r.language] = (languageCounts[r.language] || 0) + 1; });
+const frameworkCounts: Record<string, number> = {};
+rules.forEach(r => {
+  if (r.framework && r.framework !== 'Any') {
+    frameworkCounts[r.framework] = (frameworkCounts[r.framework] || 0) + 1;
+  }
+});
+const topFrameworks = Object.entries(frameworkCounts)
+  .filter(([, c]) => c >= 2)
+  .sort((a, b) => b[1] - a[1]);
 
 const tagCounts: Record<string, number> = {};
 rules.forEach(r => r.tags.forEach(tag => { tagCounts[tag] = (tagCounts[tag] || 0) + 1; }));
@@ -82,14 +91,28 @@ const categoryLabels: Record<string, string> = {
           <div>
             <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Language</h3>
             <nav class="space-y-1">
-              {Object.entries(languageCounts).map(([lang, count]) => (
-                <a href={`/rules?language=${lang}`} class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+              {Object.entries(languageCounts).filter(([, c]) => c >= 2).sort((a, b) => b[1] - a[1]).map(([lang, count]) => (
+                <a href={`/rules/lang/${lang.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`} class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
                   <span>{lang}</span>
                   <span class="text-text-faint text-[11px]">{count}</span>
                 </a>
               ))}
             </nav>
           </div>
+
+          {topFrameworks.length > 0 && (
+          <div>
+            <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">By Framework</h3>
+            <nav class="space-y-1">
+              {topFrameworks.map(([fw, count]) => (
+                <a href={`/rules/framework/${fw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`} class="flex items-center justify-between px-3 py-2 rounded-[3px] text-[13px] text-text-muted hover:text-text-main hover:bg-white/[0.03] transition-colors">
+                  <span>{fw}</span>
+                  <span class="text-text-faint text-[11px]">{count}</span>
+                </a>
+              ))}
+            </nav>
+          </div>
+          )}
 
           <div>
             <h3 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4">Tags</h3>

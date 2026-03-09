@@ -29,6 +29,25 @@ const toolCounts = {
   'image-prompt': rules.filter(r => r.tool === 'image-prompt').length,
 };
 
+// Collect languages and frameworks for landing page links
+const langCounts: Record<string, number> = {};
+rules.forEach(r => { langCounts[r.language] = (langCounts[r.language] || 0) + 1; });
+const topLangs = Object.entries(langCounts)
+  .filter(([, c]) => c >= 2)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8);
+
+const fwCounts: Record<string, number> = {};
+rules.forEach(r => {
+  if (r.framework && r.framework !== 'Any') {
+    fwCounts[r.framework] = (fwCounts[r.framework] || 0) + 1;
+  }
+});
+const topFrameworks = Object.entries(fwCounts)
+  .filter(([, c]) => c >= 2)
+  .sort((a, b) => b[1] - a[1])
+  .slice(0, 8);
+
 // Interleave image prompts evenly among code rules for visual variety
 const imageRules = rules.filter(r => r.tool === 'image-prompt');
 const codeRules = rules.filter(r => r.tool !== 'image-prompt').sort((a, b) => b.stars - a.stars);
@@ -220,6 +239,48 @@ const filters = ['All', 'Cursor', 'Claude Code', 'Agents.md', 'Image Prompts'];
       </a>
     </div>
   </section>
+
+  <!-- Browse by Language -->
+  {topLangs.length > 0 && (
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="mb-8">
+      <h2 class="text-lg font-medium tracking-tight text-text-main"
+        data-en="Browse by Language" data-ja="言語で探す">Browse by Language</h2>
+      <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+        data-en="Find rules for your programming language" data-ja="プログラミング言語でルールを絞り込む">Find rules for your programming language</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      {topLangs.map(([lang, count]) => (
+        <a href={`/rules/lang/${lang.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+          class="group flex items-center gap-2 px-4 py-2.5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-border-strong transition-all duration-200">
+          <span class="text-[14px] text-text-muted group-hover:text-text-main font-medium">{lang}</span>
+          <span class="text-[11px] text-text-faint">{count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+  )}
+
+  <!-- Browse by Framework -->
+  {topFrameworks.length > 0 && (
+  <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
+    <div class="mb-8">
+      <h2 class="text-lg font-medium tracking-tight text-text-main"
+        data-en="Browse by Framework" data-ja="フレームワークで探す">Browse by Framework</h2>
+      <p class="text-[13px] text-text-faint mt-1 tracking-wide"
+        data-en="Curated rules for popular frameworks" data-ja="人気フレームワーク向けの厳選ルール">Curated rules for popular frameworks</p>
+    </div>
+    <div class="flex flex-wrap gap-3">
+      {topFrameworks.map(([fw, count]) => (
+        <a href={`/rules/framework/${fw.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`}
+          class="group flex items-center gap-2 px-4 py-2.5 bg-surface border border-border-subtle rounded-[4px] hover:bg-surface-hover hover:border-border-strong transition-all duration-200">
+          <span class="text-[14px] text-text-muted group-hover:text-text-main font-medium">{fw}</span>
+          <span class="text-[11px] text-text-faint">{count}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+  )}
 
   <!-- Recently Added -->
   <section class="px-6 pb-16 max-w-[1400px] mx-auto w-full relative z-10">
