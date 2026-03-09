@@ -20,10 +20,12 @@ const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGEN
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="The-Prompt-Shelf" />
+    <meta property="og:url" content={Astro.url.href} />
     <meta property="og:image" content="https://thepromptshelf.dev/og-default.png" />
     <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content={title} />
+    <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
+    <link rel="canonical" href={Astro.url.href} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -126,11 +128,11 @@ const { title = 'The-Prompt-Shelf', description = 'CLAUDE.md, .cursorrules, AGEN
             <h4 class="text-[11px] font-medium text-text-faint uppercase tracking-widest mb-4"
               data-en="Popular" data-ja="人気">人気</h4>
             <nav class="space-y-2.5">
-              <a href="/rules?q=TypeScript" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">TypeScript</a>
-              <a href="/rules?q=React" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">React</a>
-              <a href="/rules?q=Next.js" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Next.js</a>
-              <a href="/rules?q=Python" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Python</a>
-              <a href="/rules?q=Flutter" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Flutter</a>
+              <a href="/rules/lang/typescript" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">TypeScript</a>
+              <a href="/rules/framework/react" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">React</a>
+              <a href="/rules/framework/next-js" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Next.js</a>
+              <a href="/rules/lang/python" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Python</a>
+              <a href="/rules/framework/flutter" class="block text-[13px] text-text-muted hover:text-text-main transition-colors">Flutter</a>
             </nav>
           </div>
 
