@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
+    "postbuild": "bash scripts/notify-search-engines.sh || true",
     "preview": "astro preview",
     "astro": "astro"
   },
